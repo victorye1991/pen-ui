@@ -1,0 +1,236 @@
+<project name="slippy" default="compile" basedir=".">
+
+	<property name="propertyFile" value="build.properties" />
+
+	<!-- ==================== All Target ====================================== -->
+
+	<target name="all"
+	        depends="clean,compile"
+	        description="Clean build and dist directories, then compile" />
+
+	<!-- ==================== Prepare Target ================================== -->
+
+	<target name="prepare" depends="setProperties">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${compile.output.dir}" />
+		<mkdir dir="${javadoc.output.dir}" />
+	</target>
+
+	<!-- ==================== Clean Target ==================================== -->
+
+	<target name="clean"
+	        depends="prepare"
+	        description="Delete old class files and backup source files">
+		<delete failonerror="false">
+			<fileset defaultexcludes="no"
+			         dir="${compile.output.dir}"
+			         includes="**/*.class" />
+			<fileset defaultexcludes="no"
+			         dir="${compile.src.dir}"
+			         includes="**/*~" />
+			<fileset defaultexcludes="no"
+			         dir="${compile.src.dir}/org/six11/slippy"
+			         includes="**/__Test*" />
+			<fileset defaultexcludes="no"
+			         dir="${compile.src.dir}/org/six11/slippy/classes"
+			         includes="**/*.class" />
+			<fileset defaultexcludes="no"
+			         dir="."
+			         includes="**/*.tokens" />
+</delete>
+		<delete dir="${build.dir}" failonerror="false" />
+	</target>
+
+	<!-- ==================== Set Properties Target =========================== -->
+
+	<target name="setProperties" depends="testPropertyFail">
+		<echo message="Loading properties from ${propertyFile}" />
+		<property file="${propertyFile}" />
+		<property file="${tomcat.props.file}" />
+
+		<path id="compile.classpath">
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar" />
+			</fileset>
+		</path>
+
+		<taskdef classpathref="compile.classpath"
+		         resource="genjar.properties" />
+	</target>
+
+	<!-- ==================== Fail Target (for when no properties are found) == -->
+
+	<target name="testPropertyFail" unless="propertyFile">
+		<echo message="Could not find a property file. Did you set one?" />
+		<echo message="Here's an example command line:" />
+		<echo message="ant -DpropertyFile=webapp/config/build.properties" />
+		<fail message="Use -DpropertyFile=some_file. See earlier message. " />
+	</target>
+
+	<!-- ==================== Jar Target ====================================== -->
+
+	<target name="jar"
+	        depends="compile"
+	        description="Makes a jar file suitable for standalone or applet execution.">
+		<echo message="Making ${jar.output} based on ${jar.topLevelClass}..." />
+		<genjar jarfile="${jar.output}">
+		 	<library jar="${lib.dir}/iText-2.1.4.jar" />
+			<class name="${jar.topLevelClass}" />
+			<!-- <class name="com.lowagie.text.pdf.collection.PdfCollection" /> -->
+			<classpath>
+				<fileset dir="${lib.dir}">
+					<include name="*.jar" />
+				</fileset>
+				<pathelement path="${compile.output.dir}" />
+			</classpath>
+			<classfilter>
+				<exclude name="org.bouncycastle." />
+			</classfilter>
+		</genjar>
+		<copy file="${jar.output}" todir="${webapp.dir}/content" />
+	</target>
+
+	<target name="compile" depends="prepare" description="Compile Java sources">
+
+		<mkdir dir="${compile.output.dir}" />
+		<javac srcdir="${compile.src.dir}"
+		       destdir="${compile.output.dir}"
+		       debug="${compile.debug}"
+		       deprecation="${compile.deprecation}"
+		       optimize="${compile.optimize}"
+		       source="1.5">
+			<classpath refid="compile.classpath" />
+			<include name="**/*.java" />
+		</javac>
+
+	</target>
+
+	<!-- ==================== Run Target ===================================== -->
+
+	<target name="run"
+	        description="Runs arbitrary code using this project's classpath"
+	        depends="compile">
+		<echo>Running ${prog} with arguments: ${args}</echo>
+		<java fork="yes" classname="${prog}">
+			<arg value="${args}" />
+			<classpath refid="compile.classpath" />
+			<classpath path="${compile.output.dir}" />
+		</java>
+	</target>
+
+	<!-- ==================== War Target ====================================== -->
+
+	<target name="war"
+	        depends="compile"
+	        description="Make Tomcat deployable WAR file.">
+		<war destfile="${build.dir}/${shortName}.war"
+		     webxml="${webapp.dir}/config/web.xml">
+			<metainf file="${webapp.dir}/config/context.xml">
+			</metainf>
+			<classes dir="${compile.output.dir}" />
+			<fileset dir="${webapp.dir}/content" />
+		</war>
+	</target>
+
+	<!-- ==================== War Install Targets ============================= -->
+
+	<target name="war-install"
+	        depends="war"
+	        description="Installs WAR file on Tomcat server.">
+		<echo message="Deploying to manager: ${tomcat.manager.url}..." />
+		<deploy url="${tomcat.manager.url}"
+		        username="${tomcat.username}"
+		        password="${tomcat.password}"
+		        path="/${shortName}"
+		        war="file:${build.dir}/${shortName}.war" />
+	</target>
+
+	<!-- ==================== War Un-Install Target ============================= -->
+
+	<target name="war-uninstall"
+	        depends="setProperties"
+	        description="Uninstalls the WAR file on Tomcat.">
+		<undeploy url="${tomcat.manager.url}"
+		          username="${tomcat.username}"
+		          password="${tomcat.password}"
+		          path="/${shortName}" />
+	</target>
+
+	<!-- ==================== War Re-Install Target ============================= -->
+
+	<target name="war-reinstall"
+	        description="Uninstall and existing WAR and redeploy it."
+	        depends="prepare, war-uninstall,war-install" />
+
+	<!-- ==================== Javadoc Target (public) =========================== -->
+
+	<target name="javadoc"
+	        depends="compile, javadoc.checkProperties"
+	        description="Create Javadoc API documentation">
+
+		<mkdir dir="${javadoc.output.dir}" />
+		<javadoc sourcepath="${compile.src.dir}"
+		         destdir="${javadoc.output.dir}"
+		         additionalparam="${breakIterIf14}"
+		         packagenames="*"
+		         source="1.5">
+			<classpath refid="compile.classpath" />
+		</javadoc>
+	</target>
+
+	<!-- ==================== Javadoc Target (private) =========================== -->
+
+	<target name="javadoc.private"
+	        depends="compile, javadoc.checkProperties"
+	        description="Create Javadoc for internal use (includes private items)">
+
+		<mkdir dir="${javadoc.output.dir}" />
+		<javadoc sourcepath="${compile.src.dir}"
+		         destdir="${javadoc.output.dir}"
+		         additionalparam="${breakIterIf14}"
+		         packagenames="*"
+		         access="private">
+			<classpath refid="compile.classpath" />
+		</javadoc>
+	</target>
+
+	<!-- ==================== Javadoc Support Target =========================== -->
+
+	<target name="javadoc.checkProperties">
+		<condition property="breakIterIf14" value="-breakiterator">
+			<equals arg1="1.4" arg2="${ant.java.version}" />
+		</condition>
+		<condition property="breakIterIf14" value="">
+			<not>
+				<equals arg1="1.4" arg2="${ant.java.version}" />
+			</not>
+		</condition>
+	</target>
+
+	<!-- ==================== ANTLR Targets ==================================== -->
+	<target name="slippy-grammar" depends="setProperties">
+		<java classname="org.antlr.Tool"
+		      classpathref="compile.classpath"
+		      fork="true">
+			<arg value="${compile.src.dir}/org/six11/slippy/SlippyLexer.g" />
+			<arg value="${compile.src.dir}/org/six11/slippy/SlippyParser.g" />
+		</java>
+	</target>
+
+	<target name="slippy" depends="slippy-grammar,compile" />
+
+	<target name="slippy-test" depends="slippy">
+		<java classname="org.antlr.gunit.Interp" fork="true">
+			<classpath>
+				<fileset dir="${lib.dir}">
+					<include name="*.jar" />
+				</fileset>
+				<pathelement path="${compile.output.dir}" />
+			</classpath>
+			<arg line="test/slippy/Slippy.gunit" />
+		</java>
+
+	</target>
+
+
+</project>

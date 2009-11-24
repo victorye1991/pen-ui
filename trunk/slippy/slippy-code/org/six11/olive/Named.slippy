@@ -1,0 +1,5 @@
+codeset org.six11.olive
+
+class Named
+  name = "unnamed thing (you can set me in your constructor)"
+done

@@ -1,0 +1,36 @@
+; Vec.slippy -- a 2D vector
+
+codeset org.six11.olive
+
+; import org.six11.olive.Pt
+
+class Vec
+  x y
+
+  define init(x_, y_)
+    x = x_
+    y = y_
+  done
+
+  define magSquared()
+    (x * x) + (y * y)
+  done
+
+  define mag()
+    sqrt(magSquared())
+  done
+
+  define add(pt)
+    new Pt(pt.x + x, pt.y + y, pt.t)
+  done
+
+  define dot(other)
+    x * other.x + y * other.y
+  done
+
+  define to_s()
+    "Vec (" + x + ", " + y + ")"
+  done
+done
+
+

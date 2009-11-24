@@ -1,0 +1,64 @@
+codeset org.six11.olive
+
+; This is a sort of 'Blackboard' data structure. It holds all manner of
+; information useful to hypothesis testing, culling, as well as more
+; practical aspects such as rendering things to the screen.
+class OliveSoup
+  activeListeners = { }
+  active = { }
+  inactive = { }
+  currentSeq = []
+  
+  define say(what)
+    print("Olive Soup sez: " + what)
+  done
+
+  define addRawSequence()
+    currentSeq = []
+  done
+
+  define addRawPoint(x, y, t)
+    currentSeq.add(new Pt(x, y, t))
+    signal("addPoint", currentSeq)
+  done
+
+  define endRawSequence()
+    s = new Sequence(currentSeq)
+    currentSeq = []
+    s.render()
+    addActive(s)
+  done
+
+  define addActive(obj)
+    if (not active[obj.name])
+      active[obj.name] = []
+    done
+    active[obj.name].add(obj)
+    signal("addBuffer", obj.renderer.buffer)
+    listeners = activeListeners[obj.name]
+    if (listeners)
+      listeners.each(lambda (listener) listener.handle(obj) done)
+    else
+      print("There aren't any listeners for type: " + obj.name)
+    done
+  done
+
+  define addActiveListener(name, listener)
+    if (not activeListeners[name])
+      activeListeners[name] = []
+    done
+    activeListeners[name].add(listener)
+  done
+
+  define getActive(name)
+    active[name]
+  done
+
+  define clearDrawing()
+    currentSeq = [ ]
+    active = { }
+    inactive = { }
+    signal("clearBuffers")
+  done
+done
+
