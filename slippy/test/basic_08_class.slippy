@@ -1,0 +1,41 @@
+class Animal
+  birthday ; starts off Nil
+  weight = 5
+  location = "Montreal"
+  
+  define eat()
+    print("An animal is eating!")
+  done
+
+  define grow(amount)
+    weight = weight + amount
+  done
+done
+
+class CanFly
+  speed = 0
+  flying = false
+
+  define startFlying()
+    flying = true
+    speed = 10
+  done
+
+  define stopFlying()
+    flying = false
+    speed = 0
+  done
+done
+
+class CanTweet
+  define tweet()
+    print("Tweeeeet!")
+  done
+done
+
+class Bird extends Animal mixes CanFly, CanTweet
+  favoriteBirdSeed = "sesame"
+  define peck()
+    print("peck peck")
+  done
+done

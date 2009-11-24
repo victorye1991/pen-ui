@@ -1,0 +1,35 @@
+class Point
+  x y
+  name
+
+  define init(x_, y_, n_)
+    x = x_
+    y = y_
+    name = n_
+  done
+
+  @cacheable
+  define magnitude()
+    print("Calculating magnitude of " + name + " (******* you should only see this one time! ********)")
+    x * y
+  done
+
+  @cacheable
+  define distanceTo(otherPt)
+    print("Calculating distance from " + name + " to " + otherPt)
+    (x * otherPt.x) + (y * otherPt.y)
+  done
+
+  define to_s()
+    return "Point " + name
+  done
+done
+
+a = new Point(10, 10, "A")
+b = new Point(20, 20, "B")
+print("Made points " + a + " and " + b)
+print("Magnitude of " + a + " is: " + a.magnitude())
+print("That value again is: " + a.magnitude())
+print("Magnitude of " + b + " is: " + b.magnitude())
+print("A second time for " + b + ": " + b.magnitude())
+print("For grins, let's do " + a + " again: " + a.magnitude())

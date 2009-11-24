@@ -1,0 +1,11 @@
+import org.six11.ImportFoo
+
+class ImportTest
+  foo = Nil
+  define init()
+    foo = new ImportFoo()
+  done
+done
+
+test = new ImportTest()
+test.foo.go()

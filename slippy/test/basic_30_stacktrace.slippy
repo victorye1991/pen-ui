@@ -1,0 +1,20 @@
+print("I am going to show the stacktrace:")
+showStacktrace()
+print("Done.")
+
+define functionA()
+  print("in function A.")
+  showStacktrace()
+  functionB()
+  print("done with function A.")
+done
+
+define functionB()
+  print("in function B.")
+  showStacktrace()
+  print("done with function B.")
+done
+
+functionA()
+showStacktrace()
+print("Done showing stacktraces. (The above 4 stacktraces were expected.)")

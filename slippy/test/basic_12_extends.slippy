@@ -1,0 +1,78 @@
+class Animal
+  foodLevel = 10
+
+  define eat(n)
+    foodLevel = foodLevel + n
+    print("I now have", foodLevel, "ounces of food in my belly")
+  done
+
+done
+
+class Named
+  name = "Anonymous"
+
+  define sayHello()
+    print(name, "greets you warmly")
+  done
+done
+
+class Pooper
+  define poop()
+    print("poop!")
+  done
+done
+
+class Dog extends Animal mixes Named, Pooper
+  
+  barkLevel = 1
+
+  define init(name_)
+    name = name_
+  done
+
+  define bark()
+    loop(barkLevel)
+      print(name, ": Woof!")
+    done
+  done
+
+done
+
+class Cat extends Animal mixes Named, Pooper
+
+  define init(name_)
+    name = name_
+  done
+
+  define meow()
+    if(not name)
+      print("Fail! I am not anonymous. My name is", name)
+    else
+      print(name, ": Mrwoooowwow")
+    done
+  done
+done
+
+Dog blue = new Dog("Blue")
+Dog romeo = new Dog("Romeo")
+romeo.barkLevel = 2
+print(blue.name, "should bark one time.")
+blue.bark()
+print(romeo.name, "should bark two times.")
+romeo.bark()
+
+print("Now it is time to feed them!")
+print("Blue has", blue.foodLevel, "units of food")
+print("Romeo has", romeo.foodLevel, "units of food")
+print("Feed them both three...")
+blue.eat(3)
+romeo.eat(3)
+print("Now give blue one and romeo three more...")
+blue.eat(1)
+romeo.eat(3)
+print("We go for a walk with two dogs and the cat...")
+blue.poop()
+romeo.poop()
+c = new Cat("Robo")
+c.poop()
+c.meow()

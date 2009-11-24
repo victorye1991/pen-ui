@@ -1,0 +1,11 @@
+a = "hello"
+b = "world"
+print("There should be spaces inserted in the first, but not in the second.")
+print("This is with commas", a, b)
+print("This is with plusop" + a + b)
+
+c = 42
+print("Here's concatting 'hello' with the number 42.0: " + a + c)
+print("Here's concatting the number 42.0 with 'hello': " + c + a)
+d = true
+print("Here's hello/true and true/hello:" + a + d + d + a)

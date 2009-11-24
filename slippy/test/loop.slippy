@@ -1,0 +1,37 @@
+x = 4
+
+print("Starting out, x is", x, "but it will be set to seven. I should loop 7 times.")
+loop(x)
+  x = 7
+  print("hi. x is",x)
+done
+print("Outside, x is ",x)
+
+print("If this prints out", x, "times, it fails. It should print 9 times.")
+loop (i : x)
+  print("Hello", i)
+  x = 9
+  a = 6
+done
+
+print ("Outside, i is", i, "(should be nil)")
+print ("Outside, x is", x, "(should be 9)")
+print ("Outside, a is", a, "(should be nil)")
+
+beatles = ["John", "Paul", "George", "Ringo"]
+
+loop (beatle : beatles)
+  print(beatle, "was a beatle!")
+  print("Is this one George?", (beatle == "George"))
+  if (beatle == "George")
+    beatles[4] = "Pete"
+  done
+done
+
+boo = true
+x = 6.3
+while (boo)
+  x = x + 1
+  boo = (x < 10)
+  print("x is", x, " and boo is", boo)
+done

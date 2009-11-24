@@ -1,0 +1,15 @@
+define playItSafe()
+  someValue = "Please don't change me."
+  print("Now I have a var called someValue, and it is currently: " + someValue)
+  playItDangerous()
+  print("After playing dangerously, somevalue is: " + someValue)
+done
+
+define playItDangerous()
+  ; Note that 'someValue' is NOT brought into this function, and therefore
+  ; writing to it should have no effect on any other context's variable with
+  ; the same name.
+  someValue = " ** ERROR **"
+done
+
+playItSafe()

@@ -1,0 +1,14 @@
+;name = "Robo"
+;print("My cat's name is", name)
+a = new Object()
+;print("An object happens to be", a)
+;a.b = new Object()
+;a.name = "Karolina"
+;print("The object's name is", a.name)
+;a.b.name = "Gabe"                   ; Tests member expressions as l-values
+
+;print ("name should be Robo:", name, "and a.name should be Karolina:", a.name, "and a.b.name should be Gabe:", a.b.name)
+a.myList = [new Object(), new Object(), a]
+;print("My list is", a.myList)
+a.myList[0].name = "Robo"
+print("My cat's name is", a.myList[0].name)

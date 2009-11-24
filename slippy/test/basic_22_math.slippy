@@ -1,0 +1,18 @@
+
+; Absolute value
+x = -4
+print("Absolute value of " + x + " is " + abs(x))
+
+; Square root
+y = 9
+print("Square root of " + y + " is " + sqrt(y))
+
+; Constants: PI, E
+print("Constant PI is " + PI)
+print("Constant E is " + E)
+
+; Trig: sine, cosine, tangent
+angle = PI / 4
+print("sin of " + angle + " is " + sin(angle))
+print("cosine of " + angle + " is " + cos(angle))
+print("tangent of " + angle + " is " + tan(angle))

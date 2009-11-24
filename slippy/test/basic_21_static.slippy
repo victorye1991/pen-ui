@@ -1,0 +1,25 @@
+
+class Color
+
+  r g b a
+
+  define init(r_, g_, b_, a_)
+    r = r_
+    g = g_
+    b = b_
+    a = a_
+  done
+
+  define to_s()
+    "Color (" + r + " " + g + " " + b + " " + a + ")"
+  done
+
+done
+
+class Colors
+  @static red = new Color(1, 0, 0, 1)
+  @static blue = new Color(0, 0, 1, 1)
+done
+
+print("Here is a color instance: " + new Color(1, 1, 0, 0))
+print("red: " + Colors.red)

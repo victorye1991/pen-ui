@@ -1,0 +1,9 @@
+x = 3
+print("Before:", x, y) ; should print 3, nil
+loop(x)
+  x = x - 1
+  y = x
+  print(x, y)
+done
+
+print("Outside:", x, y) ; should print 0, nil

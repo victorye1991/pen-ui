@@ -1,0 +1,28 @@
+beatles = { 
+	"Lead guitar" : "George",
+	"Rythym guitar" : "John",
+	"Bass"	: "Paul",
+	"Drums" : "Ringo" }
+
+print("The beatles are: " + beatles)
+
+empty = {}
+print("An empty map is: " + empty)
+
+print("Who was the bass player for the Beatles? " + beatles["Bass"])
+
+x = "Lead guitar"
+
+print("Who was the", x, "player?", beatles[x])
+
+print("How about rythym? " + beatles["Rythym" + " guitar"])	
+
+beatles["Manager"] = "Brian Epstein"
+
+print(beatles)
+print("Who was the manager? " + beatles["Manager"])
+
+print ("Now I will pretend like it is 1961...")
+beatles["Drums"] = "Pete Best"
+
+print("Who was the drummer at the time? " + beatles["Drums"])

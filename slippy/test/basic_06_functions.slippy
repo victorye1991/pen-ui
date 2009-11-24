@@ -1,0 +1,35 @@
+define f(x)
+  x * x
+done
+
+print("Defined function:", f)
+
+y = f(2)
+
+print("Calculated y = f(2):", y)
+
+z = f(y)
+
+print("Calculated z = f(y):", z)
+
+define g(x)
+  f(x) * f(x) ; equivalent of x^4
+done
+
+print("Defined function:", g)
+
+sixteen = g(2)
+
+print("Should be sixteen:", sixteen);
+
+whoknows = g(11)
+
+print("11^4 is", whoknows)
+
+
+define monkey()
+  a = 3
+  name = "Roger"
+done
+
+monkey()

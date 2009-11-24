@@ -1,0 +1,5 @@
+foo = new Object()
+foo.myList = ["Paul", "John"]
+print("Before:", foo.myList)
+foo.myList[2] = "George"
+print("After:", foo.myList)

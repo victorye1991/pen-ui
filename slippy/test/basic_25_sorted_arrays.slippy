@@ -1,0 +1,92 @@
+
+myList = []
+
+mySorter = lambda(a, b)
+  if (a > b)
+    1
+  else if (a < b)
+    -1
+  else
+    0
+  done 
+done
+
+print("lambda(1, 2) should be negative: " + mySorter(1, 2))
+print("lambda(3, 2) should be positive: " + mySorter(3, 2))
+print("lambda(2, 2) should be zero: " + mySorter(2, 2))
+
+myList.sort = mySorter
+myList.add(3)
+myList.add(4)
+myList.add(1)
+myList.add(4)
+myList.add(5)
+myList.add(2)
+myList.add(0.5)
+myList.add(6.5)
+myList.add(0.5)
+
+print("The following should be in nondecreasing order:")
+print("myList is: " + myList)
+
+print("Popping last element.")
+myList.removeAtIndex(myList.n() - 1)
+print("myList is: " + myList)
+
+print("Adding PI.")
+myList.add(PI)
+print("myList is: " + myList)
+
+print("Now I am going to start with a jumbled list and ask it to resort.")
+
+; jumble = [ 3, 1, 6, 6, 8, 5, 2, 6, 4 ]
+
+s = lambda(a, b)
+  if (a < b)
+    -1
+  else if (a > b)
+    1
+  else
+    0
+  done
+done
+
+jumble = []
+;jumble.sort = s
+jumble.add(3)
+jumble.add(1)
+jumble.add(6)
+jumble.add(6)
+jumble.add(8)
+jumble.add(5)
+jumble.add(2)
+jumble.add(6)
+jumble.add(4)
+ordered = jumble.resort(s)
+
+print("jumble   : " + jumble)
+print("ordered  : " + ordered)
+
+define sortByMod4(a, b)
+  am = a % 4
+  bm = b % 4
+  if (am < bm)
+    -1
+  else if (am > bm)
+    1
+  else
+    0
+  done
+done
+
+
+print("Now I'll use a defined function as the sort method.")
+print("Here are the numbers 0 to 11, ordered by (i % 4).")
+byMod4 = []
+byMod4.sort = sortByMod4
+count = 0
+loop(12)
+  byMod4.add(count)
+  count = count + 1
+  print(byMod4)
+done

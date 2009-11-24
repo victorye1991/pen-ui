@@ -1,0 +1,38 @@
+define f(a, b)
+  obj = new Object()
+  obj.x = "hello"
+  obj
+done
+
+print("Start... should print out object instance, hello, object instance, object, then correct x2")
+a = f(10, 20)
+print("a is", a)
+a = f(10, 20).x
+print("a is", a)
+x = new Object()    ; crummy class-ish definition.
+x.f = f             ; add 'f' to x's symbol table
+a = x.f(10, 20)     ; use 'f' like it is a member function
+print("a is", a)
+x.y = new Object()
+x.y.z = new Object()
+x.y.z.f = f
+a = x.y.z.f(10, 20)
+print("After many member expressions, a is", a)
+
+define makeObject(name)
+  obj = new Object()
+  obj.name = name
+  obj
+done
+
+define g(obj)
+  print("Hello", obj.name)
+  obj
+done
+
+a = makeObject("Wrong")
+a.b = g
+c = makeObject("Wrong")
+c.d = makeObject("Correct")
+
+print(a.b(c.d).name)

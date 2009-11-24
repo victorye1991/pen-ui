@@ -1,0 +1,63 @@
+; This is a slippy file that should have all possible language statement types.
+; It might not do anything interesting, but it should be a decent test to see
+; if the parser/interpreter is working.
+
+class Animal
+  birthday ; starts off Nil
+  weight = 0
+  location = "Montreal"
+  
+  define eat()
+    print("An animal is eating!")
+  done
+
+  define feast(firstCheer, secondCheer)
+    print(firstCheer)
+    loop(3)
+      eat()
+    done
+    print(secondCheer)
+  done
+
+  define grow(amount)
+    weight = weight + amount
+  done
+
+  define sleep()
+    weight = weight - 0.05
+    weight = weight + -0.05 ; testing unary negation
+    if (weight < 0)
+      die()
+    else if (weight == 0)
+      wake()
+    else
+      print("I sleep soundly through the night.")
+    done
+  done
+
+  define wake()
+    print("I wake up.")
+  done
+  
+done
+
+animals = [new Animal(), new Animal(), new Animal()]
+loop (animal : animals)
+  animal.feast("OH MY I AM HUNGRY!", "I just ate a lot of food!")
+done
+
+animals.each( {(animal) animal.sleep() } )
+
+booleans = []
+t = true
+f = false
+booleans.add(2 > 3)
+booleans.add(2 >= 3)
+booleans.add(2 < 3)
+booleans.add(2 <= 3)
+booleans.add(t and f)
+booleans.add(t or f)
+booleans.add(t and (t or f))
+booleans.add(not (t or f))
+
+print("Done!")

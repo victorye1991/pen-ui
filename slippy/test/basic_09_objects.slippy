@@ -1,0 +1,37 @@
+class Foo
+  fooA ; will be set to a user-provided value in the constructor
+  fooB = "ERROR" ; will be changed in the constructor
+
+  define init(v)
+    fooA = v
+    fooB = "Oogie"
+  done
+
+  define go()
+    print("Foo says", fooB)
+  done
+
+done
+
+foo1 = new Foo("Robo")
+foo2 = new Foo("Karolina")
+
+print("I made a foo:", foo1, " who has fooA:", foo1.fooA, " and fooB:", foo1.fooB)
+print("I made a foo:", foo2, " who has fooA:", foo2.fooA, " and fooB:", foo2.fooB)
+print("Now it should say 'Foo says Oogie' twice:")
+foo1.go()
+foo2.go()
+
+define setMysteryMembers()
+  myFoo = new Foo("Mysterious!")
+  showTables()
+  print("myFoo.mystery Before if statement (should be nil):")
+  print (myFoo.mystery)
+  if (not myFoo.mystery)
+    print("Excellent. I can add 'mystery members' to objects. Setting 'myFoo.mystery'...")
+    myFoo.mystery = "so very secret"
+  done
+  print("The value of myFoo.mystery is: '" + myFoo.mystery + "'. And now you know the truth.")
+done
+
+setMysteryMembers()

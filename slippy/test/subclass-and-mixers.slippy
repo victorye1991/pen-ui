@@ -1,0 +1,64 @@
+; subclass-and-mixers.slippy
+
+; Base Animal class
+class Animal
+  name = "Some sort of animal"
+  define eat() 
+    print (name + " is eating.")
+  done
+done
+
+; Here's a class designed to be mixed in to other classes. All fields
+; and functions defined here are copied into a destination class by
+; using the 'mixes' keyword.
+class ID
+  @static count = 0
+  id
+
+  ; If the mixed class has a 'mix' function, it is called with no arguments.
+  ; This is like a constructor, but for mixers.
+  define mix()
+    id = count        
+    count = count + 1 
+    print("ID mixed in. id: " + id + " count: " + count)
+  done
+
+  define ident()
+    print("I am number " + id + " of " + (count - 1))
+  done
+done
+
+class Dog extends Animal mixes ID
+
+  define init(n)  ; Object instantation is done with the init() 
+    name = n      ; function and may have any number of arguments. 
+  done            ; There may only be one init function.
+  
+  define bark()
+    print(name + ": woof!")
+  done
+done
+
+class Cat extends Animal mixes ID
+  define init(n)
+    name = n
+  done
+
+  define meow()
+    print(name + ": meow!")
+  done
+done
+
+; Make a list of Dogs and Cats
+animals = [ new Dog("Romeo"), 
+            new Cat("Robo"), 
+            new Dog("Blue"), 
+            kitty = new Cat("Swati"), 
+            new Dog("Pooch"), 
+            new Cat("Simon") ]
+
+; Use a lambda to make the animals eat and say who they are.
+animals.each( { (a) a.eat() a.ident() } );
+
+print("The special kitty cat is: ")
+print(kitty.name + " is " + kitty.id + " of " + kitty.count)

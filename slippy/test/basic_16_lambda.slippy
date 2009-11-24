@@ -1,0 +1,46 @@
+define g(x)
+  x * x
+done
+
+f = { (x) x * x }
+
+h = lambda (x) 
+  x * x 
+done
+
+print("Some numbers squared (using a 'define'd function:")
+print(g)
+print(g(1))
+print(g(2))
+print(g(3))
+
+print("Some numbers squared (using a lambda).")
+print(f)
+print(f(1))
+print(f(2))
+print(f(3))
+
+
+print("Some numbers squared (using a different syntax for lambda).")
+print(h)
+print(h(1))
+print(h(2))
+print(h(3))
+
+class TestLambda
+
+  define sayEverything()
+    messages = ["One", "Two", "Three"]
+    print("Messages is: " + messages)
+    messages.each( { (msg)
+      speak(msg)
+    })
+  done
+
+  define speak(what)
+    print("TestLambda says: " + what)
+  done
+done
+
+lamb = new TestLambda()
+lamb.sayEverything()
