@@ -1,0 +1,12 @@
+codeset org.six11.olive
+
+class ID
+  @static ID_counter = 1
+  id
+
+  define mix()
+    id = ID_counter
+    ID_counter = ID_counter + 1
+  done
+done
+

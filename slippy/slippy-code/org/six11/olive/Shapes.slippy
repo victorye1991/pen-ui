@@ -1,0 +1,39 @@
+; Shapes.slippy --
+
+codeset org.six11.olive
+
+class Shapes
+
+  define dot(turtle, pt)
+    polygon(4, nil, Colors.black, pt, 4.5, 0.2, turtle)
+  done
+
+  define polygon(nSides, fillColor, borderColor, ptCenter, length, penThickness, turtle)
+    angle = 360 / nSides
+    turtle.setThickness(penThickness)
+    turtle.up()
+    turtle.setColor(borderColor.r, borderColor.g, borderColor.b, borderColor.a)
+    if (fillColor)
+      turtle.setFillColor(fillColor.r, fillColor.g, fillColor.b, fillColor.a)
+      turtle.setFilling(true)
+    else
+      turtle.setFilling(false)
+    done
+    turtle.moveTo(ptCenter.x, ptCenter. y)
+    turtle.forward(length / 2)
+    turtle.turn(angle)
+    turtle.forward(length / 2)
+    turtle.turn(angle)
+    turtle.down()
+    loop(nSides)
+      turtle.forward(length)
+      turtle.turn(angle)
+    done
+    turtle.up()
+    if(fillColor)
+      turtle.setFilling(false)
+    done
+  done
+
+done
+

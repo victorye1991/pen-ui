@@ -1,0 +1,43 @@
+codeset org.six11.olive
+
+class Sequence mixes ID, Named, Renderable, Shapes
+  
+  points = []
+
+  define init(data)
+    points = data
+    name = "Sequence"
+  done
+
+  define render()
+    renderSolidLines()
+    ; renderDots()
+  done
+
+  define renderSolidLines()
+    renderer.setColor(0, 0, 0, 1)
+    renderer.setThickness(2.4)
+    renderer.up()
+    renderer.moveTo(points[0].x, points[0].y)
+    renderer.down()
+    points.each( { (pt)
+      renderer.moveTo(pt.x, pt.y)
+    })
+    renderer.up()
+  done
+
+  define renderDots()
+    ; renderUs = getNormalizedPoints(9.0)
+    renderUs = points
+    renderUs.each( { (pt)
+      dot(renderer, pt)
+    })
+  done
+
+  @cacheable
+  define getNormalizedPoints(dist)
+    Functions.normalize(points, dist)
+  done
+
+
+done

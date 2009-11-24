@@ -1,0 +1,18 @@
+codeset org.six11.olive
+
+class Color
+
+  r g b a
+
+  define init(red, green, blue, alpha)
+    r = red
+    g = green
+    b = blue
+    a = alpha
+  done
+
+  define to_s()
+    return "Color (" + r + ", " + g + ", " + b + ", " + a + ")"
+  done
+
+done

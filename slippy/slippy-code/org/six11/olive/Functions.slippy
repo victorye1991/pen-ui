@@ -1,0 +1,341 @@
+; Functions.slippy -- A collection of pen-related math functions.
+
+codeset org.six11.olive
+
+import org.six11.slippy.Affine
+
+class Functions
+
+  define report(points)
+    loop(pt : points)
+      print(pt)
+    done
+  done
+
+  define reportPointsForPlot(points)
+    loop(pt : points)
+      print(pt.x + " " + pt.y)
+    done
+  done
+
+  define normalize(points, d)
+    ret = []
+    runningDist = 0
+    bigVec = nil
+    smallVec = nil
+    prev = points[0]
+    first = points[0]
+    ret.add(first)
+    loop (pt : points)
+      if (pt != first)
+        bigVec = new Vec(pt.x - prev.x, pt.y - prev.y)
+        loop (bigVec.mag() > d)
+          smallVec = getVectorOfMagnitude(bigVec, d)
+          addMe = smallVec.add(prev)
+          diff = pt.t - prev.t
+          magFraction = smallVec.mag() / bigVec.mag()
+          timeGuess = prev.t + (diff * magFraction)
+          addMe.t = timeGuess
+          ret.add(addMe)
+          prev = addMe
+          bigVec = new Vec(pt.x - prev.x, pt.y - prev.y)
+        done
+      done
+    done
+    ret
+  done
+
+  ; Given vectors a and b, what is their dot product?
+  define getDotProduct(a, b)
+    if (not a)
+      print("a is null in Functions.getDotProduct. Stacktrace follows.")
+      showStacktrace()
+    done
+    if (not b)
+      print("b is null in Functions.getDotProduct. Stacktrace follows.")
+      showStacktrace()
+    done
+    (a.x * b.x) + (a.y * b.y)
+  done
+
+  define getDeterminant(a, b)
+    (a.x * b.y) - (a.y * b.x)
+  done
+
+  ; Given vectors a and b, what is the angle (in radians) between them?
+  define getAngleBetweenVectors(a, b)
+    ret = 0
+    numerator = getDotProduct(a, b)
+    denom = a.mag() * b.mag()
+    if (denom != 0)
+      quotient = numerator / denom
+      det = getDeterminant(a, b)
+      if (quotient > 1)
+        quotient = 1
+      else if (quotient < -1)
+        quotient = -1
+      done
+      ang = arccos(quotient)
+      ;if (det > 0)
+      ;  ang = ang + PI
+      ;done
+      ret = ang
+    done
+    ret
+  done
+
+  define getVectorOfMagnitude(vec, desiredMag)
+    current = vec.mag()
+    scaleFactor = desiredMag / current
+    getScaledVector(vec, scaleFactor)
+  done
+
+  define getScaledVector(vec, scaleFactor)
+    new Vec(vec.x * scaleFactor, vec.y * scaleFactor)
+  done
+
+  define getReverseVector(vec)
+    r = new Vec(-1 * vec.x, -1 * vec.y)
+    print("The reverse of " + vec + " is: " + r)
+    r
+  done
+
+  define calculateVelocity(p1, p2)
+    ds = p2.distance(p1)
+    dt = abs(p2.t - p1.t)
+    ds / dt
+  done
+
+  define getDistanceFromPointToSegment(pt, segStartPt, segEndPt)
+    lineX = segEndPt.x - segStartPt.x
+    lineY = segEndPt.y - segStartPt.y
+    ptX = pt.x - segStartPt.x
+    ptY = pt.y - segStartPt.y
+    dotprod = ptX * lineX + ptY * lineY
+    if (dotprod <= 0)
+      projlenSq = 0
+    else
+      ptX = lineX - ptX
+      ptY = lineY - ptY
+      dotprod = ptX * lineX + ptY * lineY
+      if (dotprod <= 0)
+        projlenSq = 0
+      else
+        projlenSq = dotprod * dotprod / (lineX * lineX + lineY * lineY)
+      done
+    done
+    ptMag = ptX * ptX + ptY * ptY
+    lenSq = ptMag - projlenSq
+    if (lenSq < 0)
+      lenSq = 0
+    done
+    sqrt(lenSq)
+  done
+
+  define getCurvature(points, idx, n)
+    ; get the points in the neighborhood, from idx +/- n
+    k = 1 + 2*n
+    start = idx - n
+    cursor = start
+    neighborhood = []
+    loop(k)
+      orig = points[cursor]
+      neighborhood.add(new Pt(orig.x, orig.y, orig.t))
+      cursor = cursor + 1
+    done
+    ptA = neighborhood[0]
+    ptB = neighborhood[k - 1]
+    dominantDir = new Vec(ptB.x - ptA.x, ptB.y - ptA.y)
+
+    ; now 'neighborhood' has a copy of the k points in the vicinity.
+    ;
+    ; We need to find the direction of the line that minimizes the distance
+    ; between the neighborhood points. This can be found with orthogonal
+    ; distance regression, but that involves kooky math. Instead, I will
+    ; transform the ODR into a standard linear regression problem. First,
+    ; I rotate all neighboring points about the pivot so the dominant
+    ; direction coincides with the x-axis. Then I can use normal linear
+    ; regression to find a line. Then I un-rotate that line. Its direction is
+    ; the solution---the curvature for this region of points.
+    xAxis = new Vec(1, 0)
+    dominantAngle = getAngleBetweenVectors(xAxis, dominantDir)
+    dominantAngle
+  done
+
+  ; Shorthand for makeVectorOfMagnitude(vec, 1.0)
+  define makeUnitVector(vec)
+    makeVectorOfMagnitude(vec, 1.0)
+  done
+
+  ; Makes a new vector whose vector is equal to the desired amount.
+  define makeVectorOfMagnitude(vec, m)
+    scaleFactor = m / vec.mag()
+    makeScaledVector(vec, scaleFactor)
+  done
+
+  ; Makes a new vector whose components have been scaled the given amount.
+  define makeScaledVector(vec, scaleFactor)
+    x = vec.x * scaleFactor
+    y = vec.y * scaleFactor
+    new Vec(x, y)
+  done
+
+  ; Calculates a simple linear regression line that fits the supplied points.
+  ; The return object contains 'slope' and 'intercept' members. The slope
+  ; should be interpreted in the standard algebra way: a slope of 2 means
+  ; for every 1 unit of x that changes, y changes by 2. Etc.
+  ; 
+  ; In the event that no function can fit this data because the net change in
+  ; the x direction is zero, the 'vertical' mystery member will be true. It is very
+  ; important to check for verticalness, because the slope will be invalid (NaN).
+  define getLinearRegression(points)
+    xSum = 0
+    ySum = 0
+    loop(pt : points)
+      xSum = xSum + pt.x
+      ySum = ySum + pt.y
+    done
+    xMean = xSum / points.n()
+    yMean = ySum / points.n()
+    numeratorSum = 0
+    denominatorSum = 0
+    loop(pt : points)
+      numeratorSum = numeratorSum + ((pt.x - xMean) * (pt.y - yMean))
+      denominatorSum = denominatorSum + ((pt.x - xMean) * (pt.x - xMean))
+    done
+    ret = new Object()
+    ret.vertical = denominatorSum == 0
+    ret.slope = numeratorSum / denominatorSum
+    ret.intercept = yMean - (ret.slope * xMean)
+    ret
+  done
+
+  ; Gives a list of points, each of which has been moved +dx, +dy.
+  define translateAll(points, dx, dy)
+    tr = new Affine()
+    tr.translate(dx, dy)
+    ret = []
+    loop(pt : points)
+      moved = tr.transformPoint(pt.x, pt.y)
+      ret.add(new Pt(moved["x"], moved["y"], pt.t))
+    done
+    ret
+  done
+
+  ; Gives you a list of points based on the input list, having
+  ; been rotated the given amount (in radians)
+  define rotateAll(points, angle)
+    tr = new Affine()
+    tr.rotate(angle)
+    ret = []
+    loop(pt : points)
+      rotated = tr.transformPoint(pt.x, pt.y)
+      addMe = new Pt(rotated["x"], rotated["y"], pt.t)
+      ret.add(addMe)
+    done
+    ret
+  done
+
+  ; Given an object 'source' with function 'f', find the first 
+  ; derivative at 'f(x)' using 'h', which is a small neighborhood 
+  ; around x. This method is called "Richardson Extrapolation 
+  ; Approximation (REA)".
+  define reaDifferentiate(source, x, h)
+    t1 = source.f(x - 2*h)
+    t2 = -8 * source.f(x - h)
+    t3 = 8 * source.f(x + h)
+    t4 = -source.f(x + 2*h)
+    result = (t1 + t2 + t3 + t4) / (12 * h)
+  done
+
+  ; A very simple linear interpolation algorithm. This assumes that
+  ; 'points' contains objects with x and y members, and they are in
+  ; ascending order according to x. It will return the interpolated 'y'
+  ; value (or, the exact 'y' value if there is a point where x == pt.x).
+  ;
+  ; NOTE: 'points' should represent data from a mathematical function.
+  define linearInterpolation(points, x)
+    ret = nil
+    found = false
+    cursor = 0
+    upper_idx = -1
+    ; Find the first point with pt.x > x.
+    loop (pt : points)
+      if(not found)
+        if (pt.x >= x)
+          upper_idx = cursor
+          found = true
+        done
+      done
+      cursor = cursor + 1
+    done
+    ; Catch edge-condition
+    if (upper_idx == 0)
+      ret = points[0].y
+    done
+    if (upper_idx > 0) ; can't extrapolate, sorry
+      a = points[upper_idx - 1]
+      b = points[upper_idx]
+      ; catch the condition where interpolation isn't necessary
+      if (a.x == x)
+        ret = a.y
+      else if (b.x == x)
+        ret = b.y
+      else
+        ; Triangles to the rescue!
+        distFraction = (x - a.x) / (b.x - a.x)
+        ret = a.y + (distFraction * (b.y - a.y))
+      done
+    done
+    ret
+  done
+
+ define getSplinePatch(x0, x1, x2, x3,
+		       y0, y1, y2, y3, numSteps)
+   ret = []    
+   step = 1.0 / numSteps
+   x = 0
+   y = 0
+   t0 = 0
+   t1 = 0
+   t2 = 0
+   t3 = 0
+   u = 0
+   loop(u <= 1)
+     t0 = x0 * (pow((1-u), 3)) / 6
+     t1 = x1 * ((3 * pow(u, 3)) - (6 * pow(u, 2)) + 4) / 6
+     t2 = x2 * ((-3 * pow(u, 3)) + (3 * pow(u, 2)) + (3 * u) + 1) / 6
+     t3 = x3 * (pow(u, 3)) / 6
+     x = t0 + t1 + t2 + t3
+     t0 = y0 * (pow( (1-u), 3)) / 6
+     t1 = y1 * ((3 * pow(u, 3)) - (6 * pow(u, 2)) + 4) / 6
+     t2 = y2 * ((-3 * pow(u, 3)) + (3 * pow(u, 2)) + (3 * u) + 1) / 6
+     t3 = y3 * (pow(u, 3)) / 6
+     y = t0 + t1 + t2 + t3
+     ret.add([x,y])
+     u = u + step
+   done
+   ret
+ done
+
+ define makeCubicBezier(x0, x1, x2, x3,
+			y0, y1, y2, y3, numSteps)
+   u = 0
+   step = 1 / numSteps
+   ret = []
+   loop (u <= 1)
+     x = ((x3 - x0 + (3 * x1) - (3*x2)) * pow(u,3)) +
+	 (((3*x0) - (6*x1) + (3*x2)) * pow(u,2)) +
+	 (((3*x1) - (3*x0)) * u) +
+	 x0
+     y = ((y3 - y0 + (3 * y1) - (3*y2)) * pow(u,3)) +
+	 (((3*y0) - (6*y1) + (3*y2)) * pow(u,2)) +
+	 (((3*y1) - (3*y0)) * u) +
+	 y0
+     ret.add([x, y])
+     u = u + step
+   done
+   ret
+ done
+
+done

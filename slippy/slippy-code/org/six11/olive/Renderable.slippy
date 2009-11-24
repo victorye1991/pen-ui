@@ -1,0 +1,10 @@
+codeset org.six11.olive
+
+class Renderable
+  renderer
+
+  define mix()
+    renderer = new BoundDrawingBuffer()
+  done
+done
+
