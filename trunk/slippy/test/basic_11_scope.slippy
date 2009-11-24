@@ -1,0 +1,51 @@
+n = 9
+print ("This should print", n, "times")
+
+x = 4
+loop (i : x)
+  print("Hello", i)
+  x = n
+  a = 6
+done
+
+print ("Outside, i is", i, "(should be nil)")
+print ("Outside, x is", x, "(should be", n, ")")
+print ("Outside, a is", a, "(should be nil)")
+
+
+class TestA
+  a = 10
+  define mutate()
+    a = 100
+  done
+done
+
+class TestB
+  a = 20
+  b = 500
+  define mutate()
+    a = 200
+  done
+done
+
+a = 5
+testA = new TestA()
+testB = new TestB()
+
+
+print("a starts at", a)
+print("testA starts at", testA.a)
+print("testB starts at", testB.a)
+print("testB has a b value of", testB.b)
+
+testA.mutate()
+
+print("a is then at", a)
+print("testA is then at", testA.a)
+print("testB is then at", testB.a)
+
+testB.mutate()
+
+print("a finishes at", a)
+print("testA finishes at", testA.a)
+print("testB finishes at", testB.a)

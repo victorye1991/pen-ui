@@ -1,0 +1,43 @@
+t = true
+
+if (t)
+  print("It works")
+done
+
+f = false
+
+if (f)
+  print("It doesn't work")
+done
+
+one = 1
+two = 2
+three = 3
+
+if (two > one)
+  print("It works")
+done
+
+if (two > four)
+  print("It doesn't work")
+done
+
+if (two != four)
+  print("It works");
+done
+
+if (two == four)
+  print("It doesn't work");
+done
+
+if (two >= one) 
+  print("It works");
+done
+
+if (two <= one)
+  print("It doesn't work")
+done
+
+if (two <= two)
+  print("It works")
+done

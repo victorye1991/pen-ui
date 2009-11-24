@@ -1,0 +1,21 @@
+class Foo
+  val
+  define init()
+    val = "some value"
+  done
+done
+
+class Mysterious
+  define init()
+    print("Making mysterious thing")
+  done
+done
+
+define go()
+  flubby.mystery = new Mysterious()
+done
+
+flubby = new Foo()
+print("Initialized flubby as " + flubby)
+go()
+print("Outside go(), flubby.mystery is: " + flubby.mystery)

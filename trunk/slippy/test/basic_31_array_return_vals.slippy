@@ -1,0 +1,27 @@
+
+define makeList(counter)
+  ret = []
+  k = 0
+  print("makeLists' k/ret: " + k + ", " + ret)
+  loop (3)
+    ret.add(counter * k)
+    k = k+1
+    print("makeLists' k/ret: " + k + ", " + ret)
+  done
+  ret
+done
+
+define go()
+  ret = []
+  j = 0
+  print("go's j/ret: " + j + ", " + ret)
+  loop(3)
+    x = makeList(j)
+    ret.add(x)
+    j = j+1
+    print("go's j/ret: " + j + ", " + ret)
+  done
+  ret
+done
+
+go()

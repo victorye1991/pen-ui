@@ -1,0 +1,10 @@
+class Foo
+  a = 2
+
+  define init(v)
+    a = v
+  done
+done
+
+f = new Foo(5)
+printMembers(f)

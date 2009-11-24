@@ -1,0 +1,21 @@
+class sample_class
+  favColor
+  age
+  
+  define say(what)
+  	print(what)
+  done
+  
+  define setAge(a)
+  	if (a < 0)
+  	  age = 0
+  	else if (a > 100)
+  	  age = 100
+  	else
+      age = a
+    done
+  done
+  
+  something = 4
+  another = f(x)
+done

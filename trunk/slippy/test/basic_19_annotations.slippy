@@ -1,0 +1,8 @@
+
+@foo
+define someFunction()
+  print("Hello?")
+done
+
+print("Just made a function with an annotation... should not produce a parse error.")
+someFunction()

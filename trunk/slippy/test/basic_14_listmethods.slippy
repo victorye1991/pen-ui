@@ -1,0 +1,87 @@
+myList = ["George", "John", "Ringo", "Paul"]
+print("My list of Beatles is: " + myList)
+print("It has " + myList.n() + " items.")
+myList.add("Pete")
+myList.add("Stuart", "Brian", "Yoko")
+print("If you wanted to be really loose about it, you could say the " + myList.n() + " Beatles were " + myList)
+
+loop (b : myList) 
+  print(b)
+done
+
+print("Let's remove Yoko and Stuart and print the list again.")
+
+myList.remove("Yoko")
+s = "Stuart"
+myList.remove(s)
+
+loop (b : myList) 
+  print(b)
+done
+
+print("Now I remove the item at index 4, which happens to be " + myList[4])
+
+myList.removeAtIndex(4)
+
+loop (b : myList) 
+  print(b)
+done
+
+print("What is the index of George? (should be 0)")
+print(myList.indexOf("George"));
+print("What is the index of Paul? (should be 3)")
+print(myList.indexOf("Paul"));
+print("What is the index of John? (should be 1)")
+print(myList.indexOf("John"));
+print("What is the index of Yoko? (should be nil---we removed her already))")
+print(myList.indexOf("Yoko"));
+
+class Item
+  val
+  define init(v)
+    val = v
+  done
+
+  define to_s()
+    "Item with value: " + val + " (of type: " + getType(val) + ")"
+  done
+
+  define equals(other)
+    (other and other.getClass() == getClass() and other.val == val)
+  done
+done
+
+define assertEquals(variable, desiredValue)
+  if (not (variable == desiredValue))
+    print("ERROR in assertEquals:")
+    print("* Received: " + variable)
+    print("* Expected: " + desiredValue)
+    showStacktrace()
+  done
+done
+
+myList = [new Item(42), new Item("Fourty Two"), new Item(Item)]
+
+print("I made a new list with: ")
+print("  - numeric 42")
+print("  - textual 'Fourty Two'")
+print("  - a reference to the 'Item' class itself.")
+print("Let's see if the list admits containing them! (It should show indexes or nil if not found.)")
+
+number = new Item(42)
+text = new Item("Fourty Two")
+fun = new Item(Item)
+
+print("Do you have... " + number + "? " + myList.indexOf(number))
+assertEquals(myList.indexOf(number), 0)
+print("Do you have... " + text + "? " + myList.indexOf(text))
+assertEquals(myList.indexOf(text), 1)
+print("Do you have... " + fun + "? " + myList.indexOf(fun))
+assertEquals(myList.indexOf(fun), 2)
+
+print("The following should say nil.")
+wrongNumber = new Item(41)
+print("Do you have... " + wrongNumber + "? " + myList.indexOf(wrongNumber))
+assertEquals(myList.indexOf(wrongNumber), nil)
+print("Do you have... " + nil + "? " + myList.indexOf(nil))
+assertEquals(myList.indexOf(nil), nil)

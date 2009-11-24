@@ -1,0 +1,95 @@
+; subclass-and-mixers.slippy
+
+; This class shows basic class inheritance (which isn't that
+; interesting) and mixins (which are more interesting). It features a
+; parent class (Animal) and two child classes (Dog and Cat). Dog and
+; Cat both 'mix in' another class called ID. This essentially means
+; that everything that is defined in the ID class is copied into the
+; target class.
+
+; This file also shows the syntax for annotations. An annotation is
+; simply a marker on a member field, function, or other variable that
+; gives it special powers. Here, the @static annotation in the ID
+; class says the 'count' member belongs to the class.
+
+class Animal
+  name = "Some sort of animal"
+  define eat() 
+    print (name + " is eating.")
+  done
+done
+
+class SaysSomething
+  define saySomething(what)
+    print("I say: " + what)
+  done
+done
+
+class ID
+  @static count = 0
+
+  id
+
+  define mix()
+    id = count
+    count = count + 1
+    print("ID mixed in. id: " + id + " count: " + count)
+  done
+
+  define ident()
+    print("I am number " + id + " of " + (count - 1))
+  done
+done
+
+class Dog extends Animal mixes ID, SaysSomething
+  define init(n)
+    name = n
+  done
+  
+  define bark()
+    saySomething(name + ": woof!")
+  done
+done
+
+class Cat extends Animal mixes ID
+  define init(n)
+    name = n
+  done
+
+  define meow()
+    print(name + ": meow!")
+  done
+done
+
+silly = new Cat("Sylvester")
+spooky = new Dog("Spooky the Cocker Spaniel")
+animals = [ new Dog("Romeo"), 
+            new Cat("Robo"), 
+            new Dog("Blue"), 
+            kitty = new Cat("Swati"), 
+            new Dog("Pooch"), 
+            new Cat("Simon") ]
+
+animals.each( { (a) 
+	      a.eat() 
+	      a.ident() } )
+
+print("My mom's cat: ")
+print(kitty.name + " is " + kitty.id + " of " + kitty.count)
+
+print("Now lets see if it gets mixed in functions as well.")
+spooky.saySomething("old bean")
+spooky.bark()
+if (spooky.saySomething)
+  print("Correct. Spooky can say something because he's a dog.")
+else
+  print("ERROR: The 'spooky' variable should have a 'saySomething' member function.")
+done
+
+print("A cat doesn't mix SaySomething. Ensure there is no such function there.")
+if (silly.saySomething)
+  print("ERROR: The cat can't say anything---no saySomething is mixed.")
+else
+  print("Correct.")
+done
+

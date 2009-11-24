@@ -1,0 +1,44 @@
+listA = [10, 20, 30, 40]
+listB = []
+print("Starting out:")
+print("listA: " + listA)
+print("listB: " + listB)
+print("Copying list A to B...")
+listB = listA.copy()
+print("listA: " + listA)
+print("listB: " + listB)
+print("Adding 1 2 3 to list A and A B C to list B.")
+listA.add(1, 2, 3)
+listB.add("A", "B", "C")
+print("listA: " + listA)
+print("listB: " + listB)
+
+class Foo
+  f
+  define init(val)
+    f = val
+  done
+
+  define to_s()
+     "Foo: " + f
+  done
+done
+
+obj1 = new Foo("foo object")
+listA.add(obj1)
+print("Added " + obj1 + " to listA:")
+print("listA: " + listA)
+print("Copying listA to listB...")
+listB = listA.copy()
+print("Modifying that object, and it should show up in both lists.")
+obj1.f = "I have changed!"
+print("listA: " + listA)
+print("listB: " + listB)
+print("Changing it again, and copying the list to listC...")
+obj1.f = "I changed yet again."
+listC = listA.copy()
+print("listA: " + listA)
+print("listB: " + listB)
+print("listC: " + listC)
+
+

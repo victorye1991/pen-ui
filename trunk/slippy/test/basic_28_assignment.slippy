@@ -1,0 +1,10 @@
+
+define mutate(x)
+  x = [4, 3]
+  print("During: " + x)
+done
+
+something = [1, 2]
+print("Before: " + something)
+mutate(something)
+print("After: " + something)

@@ -1,0 +1,29 @@
+define doStuff(num, str, list, obj)
+  num = 3
+  str = "ERROR"
+  list.add("Acceptable")
+  obj.mystery = "Acceptable"
+done
+
+a = 10
+b = "Acceptable"
+c = ["OK", "Great", "Fine"]
+d = new Object()
+d.expected = "Acceptable"
+
+print("** Before: (expects 10, acceptable, list-of-good-things, obj ref, acceptable, nil):")
+print(a)
+print(b)
+print(c)
+print(d)
+print(d.expected)
+print(d.mystery)
+doStuff(a, b, c, d)
+print("** After: (expects same as above, except one item added to list, and the 'nil' is now 'acceptable'):")
+print(a)
+print(b)
+print(c)
+print(d)
+print(d.expected)
+print(d.mystery)
+

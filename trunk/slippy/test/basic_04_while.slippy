@@ -1,0 +1,13 @@
+x = 5
+print("counting down from", x, "to 0...")
+while (x > 0)
+  print("x is now", x)
+  x = x - 1
+done
+print("x finishes at", x);
+
+b = true
+while(b)
+  print("This should print only once.")
+  b = false
+done

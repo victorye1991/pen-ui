@@ -1,0 +1,58 @@
+
+define yes()
+  true
+done
+
+define no()
+  false
+done
+
+define yesButError()
+  print("ERROR -- yesButError should never execute.")
+  true
+done
+
+define noButError()
+  print("ERROR -- noButError should never execute.")
+  false
+done
+
+if (yes())
+  print("Correct (1/3)")
+  print("Correct (2/3)")
+  print("Correct (3/3)")
+else if (no())
+  print("ERROR! (1/3)")
+  print("ERROR! (2/3)")
+  print("ERROR! (3/3)")
+else
+  print("ERROR! (1/3)")
+  print("ERROR! (2/3)")
+  print("ERROR! (3/3)")
+done
+
+if (no())
+  print("ERROR! (1/3)")
+  print("ERROR! (2/3)")
+  print("ERROR! (3/3)")
+else if (yes() or noButError())
+  print("Correct (1/3)")
+  print("Correct (2/3)")
+  print("Correct (3/3)")
+done
+
+if (no())
+  print("ERROR! (1/3)")
+  print("ERROR! (2/3)")
+  print("ERROR! (3/3)")
+else if (no() and yesButError())
+  print("ERROR! (1/3)")
+  print("ERROR! (2/3)")
+  print("ERROR! (3/3)")
+else
+  print("Correct (1/3)")
+  print("Correct (2/3)")
+  print("Correct (3/3)")
+done
+
+

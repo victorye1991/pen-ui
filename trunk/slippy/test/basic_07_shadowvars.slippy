@@ -1,0 +1,25 @@
+x = 10
+
+define mutate()
+  x = "Correct"
+  y = "ERROR!"
+done
+
+print ("x Before:", x, "(should be 10)")
+print ("y Before:", y, "(should be nil")
+mutate()
+print ("x After:", x, "should be Correct")
+print ("y After:", y, "should be nil")
+
+
+define change(x)
+  print ("Inside change, x is", x)
+  x = "You should only see this one time."
+  print("The value of x is: " + x)
+done
+
+change(x)
+print("Outside change, x is", x)
+
+
+

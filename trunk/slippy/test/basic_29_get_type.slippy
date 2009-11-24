@@ -1,0 +1,17 @@
+print("The following should print String, Number, Array, Boolean, Instance, Function.")
+a = "This is a string"
+b = 42.0
+c = [a, b]
+d = false
+e = new Object()
+f = lambda(x) x * x done
+
+print("a: " + getType(a))
+print("b: " + getType(b))
+print("c: " + getType(c))
+print("d: " + getType(d))
+print("e: " + getType(e))
+print("f: " + getType(f))
+
+print("So is c an array? " + (getType(c) == "Array"))
+print("So you mean it isn't a string? " + (getType(c) == "String"))

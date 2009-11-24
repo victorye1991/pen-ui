@@ -1,0 +1,77 @@
+; basic_34_symbolstack.slippy - Tests various conditions where
+; context is pushed, popped, or otherwise changed. This unit test
+; was written after I found an insidious bug in the way symbols
+; were being resolved.
+
+; Several problems to test:
+;   - calling functions that improperly access variables in the calling context.
+;   - from global context, calling instance functions without properly setting scope
+;   - from instance methods, calling other instance methods without properly setting scope
+;   - from instance methods, calling global functions without properly setting scope
+
+; All variables in this file adhere to a naming convention, with the exception of 'x', 'y', and 'z':
+;   - GLOBAL functions and variables start with g_
+;   - INSTANCE functions and variables start with o_
+
+; As for x, y, z: they are purposefully ambiguous
+;   - 'x' is declared globally but is shadowed sometimes.
+;   - 'y' is used in global functions, but should not be shared among them.
+;   - 'z' is used in various instances, but should not be shared among them.
+
+g_a = 2
+g_b = "some text"
+x = 2
+define g_f(x)
+  print("g_f (take 1): " + x)
+  g_h(x + 1)
+  print("g_f (take 2): " + x)
+done
+
+define g_h(x)
+  g_a = x * x
+  print("g_h: " + g_a)
+done
+
+print("x (before): " + x)
+print("g_a: " + g_a)
+print("g_b: " + g_b)
+g_h(g_a)
+g_h(g_a)
+print("x (after): " + x)
+
+class Foo
+  z = "class value of z"
+  miscObj
+
+  define init(x)
+    z = x
+    miscObj = new Object()
+    miscObj.x = "Tricky"
+  done
+
+  define o_getZ()
+    print("in o_getZ(), z is: " + z)
+    z
+  done
+
+  define o_getMiscObj()
+    miscObj
+  done
+
+  define to_s()
+    "Foo<" + o_getZ() + ">"
+  done
+done
+
+g_foo1 = new Foo("first value")
+g_foo2 = new Foo("second value")
+print("instance 1: " + g_foo1)
+print("instance 2: " + g_foo2)
+print("direct access to instance 1's z value: " + g_foo1.z)
+print("using accessor to instance 1's z value: " + g_foo1.o_getZ())
+print("direct access to instance 2's z value: " + g_foo2.z)
+print("using accessor to instance 2's z value: " + g_foo2.o_getZ())
+print("instance 1's misc object: " + g_foo1.miscObj)
+print("instance 1's misc object's x value (direct approach): " + g_foo1.miscObj.x)
+print("instance 1's misc object's x value (via getMiscObj()): " + g_foo1.o_getMiscObj().x)
+print("static Foo.z is: " + Foo.z)

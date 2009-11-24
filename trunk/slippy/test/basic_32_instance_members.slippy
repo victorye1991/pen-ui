@@ -1,0 +1,35 @@
+class Foo
+  x
+  define init()
+    x = "OK"
+  done
+
+  define callPrintX()
+    printX()
+  done
+
+  define printX()
+    ; showTables()
+    print("Value of x: " + x)
+  done
+
+  define printY()
+    print("Value of y: " + y + " (should be nil)")
+  done
+done
+
+define go()
+  y = "Not OK."
+  f = new Foo()
+  print ("These should be the same...")
+  print("Calling f.printX()...")
+  f.printX()
+  print("Calling callPrintX()")
+  f.callPrintX()
+  print("And this shuld be nil.")
+  f.printY()
+done
+
+go()
+    
+  

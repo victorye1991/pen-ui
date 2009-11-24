@@ -1,0 +1,24 @@
+
+loop(3)
+  print("It works three times!")
+done
+
+boo = true
+loop(boo)
+  print("I should 'loop' one time.")
+  boo = false
+done
+
+x = 3
+loop(x)
+  x = x + 0.1
+  y = x
+  print("It works. The value of x is: ", x, "and y is", y)
+done
+
+print ("After adding a little bit to x (internally), x on the outside should be 3.3:", x, "and y should be nil:", y)
+
+myList = ["John", "Paul", "George", "Ringo"]
+loop(x : myList)
+  print ("One of the Beatles is:", x)
+done

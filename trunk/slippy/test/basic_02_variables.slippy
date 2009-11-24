@@ -1,0 +1,33 @@
+print("This should print out 10, 10, 10, 100, 22")
+x = 10
+print (x)
+x = (10)
+print (x)
+x = (5 + 5)
+print (x)
+y = x * x
+print (y)
+a = 2
+b = 3
+c = 4
+d = a * b * b + c
+print (d)
+print ("The last value was the expression: a * b * b + c, where a is", a, "b is", b, "c is", c)
+print ("Can it do it inside a function param list?", a * b * b + c)
+t = true
+print("This should say true:", t)
+f = false
+print("This should say false:", f)
+name = "Dorp Zirconium"
+print("My favorite space captain is:", name)
+empty = []
+print("Here is an empty list:", empty)
+primes = [ 2, 3, 5, 7]
+print("Here is a list with the first four prime numbers:", primes)
+print("The third one is", primes[2])
+nested = ["a", "b", ["c", "d"]]
+print("The nested list is (a, b, (c, d)):", nested)
+joined = [primes, nested]
+print("Here's two lists put into a two-element list:", joined)
+joined[1] = "YELLOW"
+print("I put a color in the second slot:", joined)

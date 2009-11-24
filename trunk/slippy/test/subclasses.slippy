@@ -1,0 +1,55 @@
+
+class Animal
+  name = "Some sort of animal"
+  define eat() 
+    print (name + " is eating.")
+  done
+done
+
+class ID
+  @static count = 0
+
+  id
+
+  define mix()
+    id = count
+    count = count + 1
+    print("ID mixed in. id: " + id + " count: " + count)
+  done
+
+  define ident()
+    print("I am number " + id + " of " + (count - 1))
+  done
+done
+
+class Dog extends Animal mixes ID
+  define init(n)
+    name = n
+  done
+  
+  define bark()
+    print(name + ": woof!")
+  done
+done
+
+class Cat extends Animal mixes ID
+  define init(n)
+    name = n
+  done
+
+  define meow()
+    print(name + ": meow!")
+  done
+done
+
+animals = [ new Dog("Romeo"), 
+            new Cat("Robo"), 
+            new Dog("Blue"), 
+            kitty = new Cat("Swati"), 
+            new Dog("Pooch"), 
+            new Cat("Simon") ]
+
+animals.each( { (a) a.eat() a.ident() } ); a.printSymbolTable() } )
+
+print("My mom's cat: ")
+print(kitty.name + " is " + kitty.id + " of " + kitty.count)
