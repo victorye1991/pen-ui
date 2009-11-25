@@ -35,7 +35,7 @@ public class OliveAppletMessageBus extends MessageBus {
 
     signalHandlers.put("clear log", new SignalHandler() {
       public void handle(List<Thing> args) {
-        applet.logClear();
+//        applet.logClear();
         applet.getDrawingSurface().repaint();
       }
     });    

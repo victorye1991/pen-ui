@@ -131,7 +131,7 @@ public class OliveApplet extends JApplet {
     diagnostics.add(stdoutScroller, BorderLayout.CENTER);
     // -- combine in a split pane
     JSplitPane left = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topLeft, diagnostics);
-    left.setDividerLocation(500);
+    left.setDividerLocation(330);
 
     // configure the right side: text editor on the top/middle, and a little status on the bottom
     editorTabs = new JTabbedPane();
@@ -250,47 +250,47 @@ public class OliveApplet extends JApplet {
       }
     });
 
-    actions.put("Subversion Status", new NamedAction("Status") {
-      public void activate() {
-        try {
-          svnStatus();
-        } catch (IOException ex) {
-          ex.printStackTrace();
-        }
-      }
-    });
+//    actions.put("Subversion Status", new NamedAction("Status") {
+//      public void activate() {
+//        try {
+//          svnStatus();
+//        } catch (IOException ex) {
+//          ex.printStackTrace();
+//        }
+//      }
+//    });
+//
+//    actions.put("Subversion Update", new NamedAction("Update") {
+//      public void activate() {
+//        try {
+//          svnUpdate();
+//        } catch (IOException ex) {
+//          ex.printStackTrace();
+//        }
+//      }
+//    });
+//
+//    actions.put("Subversion Commit", new NamedAction("Commit") {
+//      public void activate() {
+//        try {
+//          svnCommit();
+//        } catch (IOException ex) {
+//          ex.printStackTrace();
+//        }
+//      }
+//    });
 
-    actions.put("Subversion Update", new NamedAction("Update") {
-      public void activate() {
-        try {
-          svnUpdate();
-        } catch (IOException ex) {
-          ex.printStackTrace();
-        }
-      }
-    });
-
-    actions.put("Subversion Commit", new NamedAction("Commit") {
-      public void activate() {
-        try {
-          svnCommit();
-        } catch (IOException ex) {
-          ex.printStackTrace();
-        }
-      }
-    });
-
-    actions.put("Log Clear", new NamedAction("Log Clear") {
-      public void activate() {
-        logClear();
-      }
-    });
-
-    actions.put("Log Post", new NamedAction("Log Post") {
-      public void activate() {
-        logPost();
-      }
-    });
+//    actions.put("Log Clear", new NamedAction("Log Clear") {
+//      public void activate() {
+//        logClear();
+//      }
+//    });
+//
+//    actions.put("Log Post", new NamedAction("Log Post") {
+//      public void activate() {
+//        logPost();
+//      }
+//    });
 
     for (Action action : actions.values()) {
       KeyStroke s = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
@@ -317,17 +317,17 @@ public class OliveApplet extends JApplet {
     fileMenu.add(actions.get("Browse"));
     bar.add(fileMenu);
 
-    JMenu svnMenu = new JMenu("Subversion");
-    svnMenu.add(actions.get("Subversion Status"));
-    svnMenu.add(actions.get("Subversion Update"));
-    svnMenu.add(actions.get("Subversion Commit"));
-    bar.add(svnMenu);
+//    JMenu svnMenu = new JMenu("Subversion");
+//    svnMenu.add(actions.get("Subversion Status"));
+//    svnMenu.add(actions.get("Subversion Update"));
+//    svnMenu.add(actions.get("Subversion Commit"));
+//    bar.add(svnMenu);
 
-    // bug("Making log menu!");
-    JMenu logMenu = new JMenu("Log");
-    logMenu.add(actions.get("Log Clear"));
-    logMenu.add(actions.get("Log Post"));
-    bar.add(logMenu);
+//    // bug("Making log menu!");
+//    JMenu logMenu = new JMenu("Log");
+//    logMenu.add(actions.get("Log Clear"));
+//    logMenu.add(actions.get("Log Post"));
+//    bar.add(logMenu);
 
     setJMenuBar(bar);
   }
@@ -348,40 +348,40 @@ public class OliveApplet extends JApplet {
     }
   }
 
-  protected void svnUpdate() throws IOException {
-    HttpUtil wcl = interp.getMachine().getWebClassLoader();
-    String up = getCodeBase() + "svn/update";
-    bug("Sending sketch data to: " + up);
-    String resp = wcl.downloadUrlToString(up);
-    bug(resp);
-  }
+//  protected void svnUpdate() throws IOException {
+//    HttpUtil wcl = interp.getMachine().getWebClassLoader();
+//    String up = getCodeBase() + "svn/update";
+//    bug("Sending sketch data to: " + up);
+//    String resp = wcl.downloadUrlToString(up);
+//    bug(resp);
+//  }
+//
+//  protected void svnCommit() throws IOException {
+//    String msg = JOptionPane.showInputDialog("Enter your (mandatory) commit message:");
+//    if (msg == null || msg.length() == 0) {
+//      bug("Cancelled commit.");
+//    } else {
+//      HttpUtil web = interp.getMachine().getWebClassLoader();
+//      String commit = getCodeBase() + "svn/commit";
+//      bug("Sending sketch data to: " + commit);
+//      HttpURLConnection con = web.initPostConnection(commit);
+//      String encodedCommitMsg = URLEncoder.encode(msg, "UTF-8");
+//      con.setRequestProperty("Content-Length", "" + encodedCommitMsg.length());
+//
+//      StreamUtil.writeStringToOutputStream(encodedCommitMsg, con.getOutputStream());
+//      con.getOutputStream().close();
+//      con.getInputStream();
+//    }
+//  }
 
-  protected void svnCommit() throws IOException {
-    String msg = JOptionPane.showInputDialog("Enter your (mandatory) commit message:");
-    if (msg == null || msg.length() == 0) {
-      bug("Cancelled commit.");
-    } else {
-      HttpUtil web = interp.getMachine().getWebClassLoader();
-      String commit = getCodeBase() + "svn/commit";
-      bug("Sending sketch data to: " + commit);
-      HttpURLConnection con = web.initPostConnection(commit);
-      String encodedCommitMsg = URLEncoder.encode(msg, "UTF-8");
-      con.setRequestProperty("Content-Length", "" + encodedCommitMsg.length());
-
-      StreamUtil.writeStringToOutputStream(encodedCommitMsg, con.getOutputStream());
-      con.getOutputStream().close();
-      con.getInputStream();
-    }
-  }
-
-  protected void svnStatus() throws IOException {
-    HttpUtil web = interp.getMachine().getWebClassLoader();
-    String st = getCodeBase() + "svn/status";
-    bug("Sending svn st request to: " + st);
-    String resp = web.downloadUrlToString(st);
-    bug(resp);
-    JOptionPane.showMessageDialog(null, resp);
-  }
+//  protected void svnStatus() throws IOException {
+//    HttpUtil web = interp.getMachine().getWebClassLoader();
+//    String st = getCodeBase() + "svn/status";
+//    bug("Sending svn st request to: " + st);
+//    String resp = web.downloadUrlToString(st);
+//    bug(resp);
+//    JOptionPane.showMessageDialog(null, resp);
+//  }
 
   protected void browse() {
     if (browserDialog == null) {
@@ -693,32 +693,32 @@ public class OliveApplet extends JApplet {
     new BoundDrawingBuffer(interp); // TODO: what is the point of this line?
   }
 
-  protected void logClear() {
-    stdout.setText("");
-  }
-
-  protected void logPost() {
-    String logContents = stdout.getText();
-    int resp = 0;
-    bug("posting log with " + logContents.length() + " chars...");
-    try {
-      HttpUtil web = interp.getMachine().getWebClassLoader();
-      HttpURLConnection con = web.initPostConnection(getCodeBase() + "log/");
-      StreamUtil.writeStringToOutputStream(URLEncoder.encode(logContents, "UTF-8"), con
-          .getOutputStream());
-      con.getOutputStream().close();
-      con.getInputStream(); // not sure why but this is necessary for the above to work.
-      resp = con.getResponseCode();
-      Debug.outputStream.println("Got response code from server: " + resp);
-      Debug.outputStream.println("Posted log file (" + logContents.length()
-          + " characters). Check the 'logs' listing.");
-    } catch (MalformedURLException ex) {
-      ex.printStackTrace();
-    } catch (IOException ex) {
-      ex.printStackTrace();
-    }
-    bug("OK, done with logPost() (response code: " + resp + ")");
-  }
+//  protected void logClear() {
+//    stdout.setText("");
+//  }
+//
+//  protected void logPost() {
+//    String logContents = stdout.getText();
+//    int resp = 0;
+//    bug("posting log with " + logContents.length() + " chars...");
+//    try {
+//      HttpUtil web = interp.getMachine().getWebClassLoader();
+//      HttpURLConnection con = web.initPostConnection(getCodeBase() + "log/");
+//      StreamUtil.writeStringToOutputStream(URLEncoder.encode(logContents, "UTF-8"), con
+//          .getOutputStream());
+//      con.getOutputStream().close();
+//      con.getInputStream(); // not sure why but this is necessary for the above to work.
+//      resp = con.getResponseCode();
+//      Debug.outputStream.println("Got response code from server: " + resp);
+//      Debug.outputStream.println("Posted log file (" + logContents.length()
+//          + " characters). Check the 'logs' listing.");
+//    } catch (MalformedURLException ex) {
+//      ex.printStackTrace();
+//    } catch (IOException ex) {
+//      ex.printStackTrace();
+//    }
+//    bug("OK, done with logPost() (response code: " + resp + ")");
+//  }
 
   protected void interpret() {
     Debug.outputStream.println("------- (interpreting at " + new Date() + ") ---");
