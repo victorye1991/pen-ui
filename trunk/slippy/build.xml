@@ -34,10 +34,8 @@
 			<fileset defaultexcludes="no"
 			         dir="${compile.src.dir}/org/six11/slippy/classes"
 			         includes="**/*.class" />
-			<fileset defaultexcludes="no"
-			         dir="."
-			         includes="**/*.tokens" />
-</delete>
+			<fileset defaultexcludes="no" dir="." includes="**/*.tokens" />
+		</delete>
 		<delete dir="${build.dir}" failonerror="false" />
 	</target>
 
@@ -74,7 +72,7 @@
 	        description="Makes a jar file suitable for standalone or applet execution.">
 		<echo message="Making ${jar.output} based on ${jar.topLevelClass}..." />
 		<genjar jarfile="${jar.output}">
-		 	<library jar="${lib.dir}/iText-2.1.4.jar" />
+			<library jar="${lib.dir}/iText-2.1.4.jar" />
 			<class name="${jar.topLevelClass}" />
 			<!-- <class name="com.lowagie.text.pdf.collection.PdfCollection" /> -->
 			<classpath>
@@ -91,7 +89,6 @@
 	</target>
 
 	<target name="compile" depends="prepare" description="Compile Java sources">
-
 		<mkdir dir="${compile.output.dir}" />
 		<javac srcdir="${compile.src.dir}"
 		       destdir="${compile.output.dir}"
@@ -209,12 +206,36 @@
 
 	<!-- ==================== ANTLR Targets ==================================== -->
 	<target name="slippy-grammar" depends="setProperties">
+		<!-- First generate the source files. -->
+		<mkdir dir="${compile.antlr.java.dir}" />
 		<java classname="org.antlr.Tool"
 		      classpathref="compile.classpath"
 		      fork="true">
+			<arg value="-o" />
+			<arg value="${compile.antlr.java.dir}" />
 			<arg value="${compile.src.dir}/org/six11/slippy/SlippyLexer.g" />
 			<arg value="${compile.src.dir}/org/six11/slippy/SlippyParser.g" />
+			<arg value="${compile.src.dir}/org/six11/slippy/SlippySyntaxLexer.g" />
+			<arg value="${compile.src.dir}/org/six11/slippy/SlippySyntaxParser.g" />
+			<arg value="${compile.src.dir}/org/six11/slippy/SlippySyntaxWalker.g" />
 		</java>
+
+		<!-- Now compile them. -->
+		<mkdir dir="${compile.antlr.output.dir}" />
+		<javac srcdir="${compile.antlr.java.dir}"
+		       destdir="${compile.antlr.output.dir}"
+		       debug="${compile.debug}"
+		       deprecation="${compile.deprecation}"
+		       optimize="${compile.optimize}"
+		       source="1.5">
+			<classpath refid="compile.classpath" />
+			<include name="**/*.java" />
+		</javac>
+
+		<!-- Jar them up -->
+		<jar destfile="${lib.dir}/slippy-parser.jar"
+		     basedir="${compile.antlr.output.dir}">
+		</jar>
 	</target>
 
 	<target name="slippy" depends="slippy-grammar,compile" />
@@ -229,7 +250,6 @@
 			</classpath>
 			<arg line="test/slippy/Slippy.gunit" />
 		</java>
-
 	</target>
 
 
