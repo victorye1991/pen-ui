@@ -11,21 +11,21 @@ import org.six11.util.Debug;
 
 /**
  * 
- *
+ * 
  * @author Gabe Johnson <johnsogg@cmu.edu>
  */
-public class OliveAppletMessageBus extends MessageBus {
-  
+public class OliveIDEMessageBus extends MessageBus {
+
   private Map<String, SignalHandler> signalHandlers;
-  private OliveApplet applet;
-  
+  private OliveIDE ide;
+
   /**
    * Creates the message bus and attach it with the given applet.
    */
-  public OliveAppletMessageBus(final OliveApplet applet) {
-    this.setApplet(applet);
+  public OliveIDEMessageBus(final OliveIDE applet) {
+    this.setIDE(applet);
     signalHandlers = new HashMap<String, SignalHandler>();
-    
+
     signalHandlers.put("addPoint", new SignalHandler() {
       public void handle(List<Thing> args) {
         applet.getSoup().drawCurrentSequence((Thing.Array) args.get(0));
@@ -35,11 +35,11 @@ public class OliveAppletMessageBus extends MessageBus {
 
     signalHandlers.put("clear log", new SignalHandler() {
       public void handle(List<Thing> args) {
-//        applet.logClear();
+        // applet.logClear();
         applet.getDrawingSurface().repaint();
       }
-    });    
-    
+    });
+
     signalHandlers.put("addBuffer", new SignalHandler() {
       public void handle(List<Thing> args) {
         Thing.JavaObject t = (Thing.JavaObject) args.get(0);
@@ -49,7 +49,7 @@ public class OliveAppletMessageBus extends MessageBus {
         applet.getDrawingSurface().repaint();
       }
     });
-    
+
     signalHandlers.put("clearBuffers", new SignalHandler() {
       public void handle(List<Thing> args) {
         applet.getSoup().clearBuffers();
@@ -67,21 +67,21 @@ public class OliveAppletMessageBus extends MessageBus {
       String kind = paramValues.get(0).toString();
       List<Thing> rest = paramValues.subList(1, paramValues.size());
       if (signalHandlers.containsKey(kind)) {
-      signalHandlers.get(kind).handle(rest);
+        signalHandlers.get(kind).handle(rest);
       }
     }
   }
-  
+
   @SuppressWarnings("unused")
   private static void bug(String what) {
     Debug.out("OliveAppletMessageBus", what);
   }
 
-  public void setApplet(OliveApplet applet) {
-    this.applet = applet;
+  public void setIDE(OliveIDE ide) {
+    this.ide = ide;
   }
 
-  public OliveApplet getApplet() {
-    return applet;
+  public OliveIDE getIDE() {
+    return ide;
   }
 }
