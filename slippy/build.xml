@@ -102,6 +102,21 @@
 
 	</target>
 
+	<!-- The following is a temporary thing as I investigate CodeCover -->
+	<target name="compile-instrumented" depends="prepare">
+		<mkdir dir="${compile.output.dir}" />
+		<javac srcdir="instr"
+		       destdir="${compile.output.dir}"
+		       debug="${compile.debug}"
+		       deprecation="${compile.deprecation}"
+		       optimize="${compile.optimize}"
+		       source="1.5">
+			<classpath refid="compile.classpath" />
+			<include name="**/*.java" />
+		</javac>
+
+	</target>
+
 	<!-- ==================== Run Target ===================================== -->
 
 	<target name="run"
