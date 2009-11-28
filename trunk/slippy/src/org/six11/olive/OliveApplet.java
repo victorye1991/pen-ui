@@ -1,8 +1,6 @@
 package org.six11.olive;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -25,7 +23,6 @@ import org.antlr.runtime.tree.Tree;
 import org.six11.slippy.*;
 import org.six11.util.Debug;
 import org.six11.util.gui.ColoredTextPane;
-import org.six11.util.gui.Components;
 import org.six11.util.io.FileUtil;
 import org.six11.util.io.HttpUtil;
 import org.six11.util.io.StreamUtil;
@@ -42,6 +39,7 @@ public class OliveApplet extends JApplet {
 
   private static final String SCRATCH_NAME = "*scratch*";
   protected Object fileName;
+
   private Map<String, NamedAction> actions;
   private JPanel buttons;
   private Map<String, JButton> slippyButtons;
@@ -75,12 +73,6 @@ public class OliveApplet extends JApplet {
   private Map<String, String> buffers;
 
   /**
-   * Maps strings such as "123" to sketch source strings (sequences of pen_down/pen_move/pen_up
-   * lines). The suffix (".sketch") is NOT included.
-   */
-  private Map<String, String> sketchStrings;
-
-  /**
    * Maps fully-qualified class names to editor components.
    */
   private Map<String, SlippyEditor> editors;
@@ -92,8 +84,6 @@ public class OliveApplet extends JApplet {
 
   private WhackTabWhenDirty dirtyWhacker;
 
-  private JDialog browserDialog;
-
   public void init() {
 
     Debug.useColor = false;
@@ -103,7 +93,6 @@ public class OliveApplet extends JApplet {
     slippySourceFiles = new HashMap<String, String>();
     buffers = new HashMap<String, String>();
     editors = new HashMap<String, SlippyEditor>();
-    sketchStrings = new HashMap<String, String>();
 
     JPanel topLeft = new JPanel();
     topLeft.setLayout(new BorderLayout());
@@ -150,7 +139,6 @@ public class OliveApplet extends JApplet {
 
     if (isRunningInBrowser) {
       resetJavaBindings();
-      initBrowserDialog();
       includeSampleProgram1();
       interpret();
     }
@@ -235,63 +223,6 @@ public class OliveApplet extends JApplet {
     };
 
     actions.put("New", newAction);
-    actions.put("Save Sketch", new NamedAction("Save Sketch") {
-      public void activate() {
-        try {
-          saveSketch();
-        } catch (IOException ex) {
-          ex.printStackTrace();
-        }
-      }
-    });
-    actions.put("Browse", new NamedAction("Browse") {
-      public void activate() {
-        browse();
-      }
-    });
-
-//    actions.put("Subversion Status", new NamedAction("Status") {
-//      public void activate() {
-//        try {
-//          svnStatus();
-//        } catch (IOException ex) {
-//          ex.printStackTrace();
-//        }
-//      }
-//    });
-//
-//    actions.put("Subversion Update", new NamedAction("Update") {
-//      public void activate() {
-//        try {
-//          svnUpdate();
-//        } catch (IOException ex) {
-//          ex.printStackTrace();
-//        }
-//      }
-//    });
-//
-//    actions.put("Subversion Commit", new NamedAction("Commit") {
-//      public void activate() {
-//        try {
-//          svnCommit();
-//        } catch (IOException ex) {
-//          ex.printStackTrace();
-//        }
-//      }
-//    });
-
-//    actions.put("Log Clear", new NamedAction("Log Clear") {
-//      public void activate() {
-//        logClear();
-//      }
-//    });
-//
-//    actions.put("Log Post", new NamedAction("Log Post") {
-//      public void activate() {
-//        logPost();
-//      }
-//    });
-
     for (Action action : actions.values()) {
       KeyStroke s = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
       if (s != null) {
@@ -316,19 +247,6 @@ public class OliveApplet extends JApplet {
     fileMenu.add(actions.get("Save Sketch"));
     fileMenu.add(actions.get("Browse"));
     bar.add(fileMenu);
-
-//    JMenu svnMenu = new JMenu("Subversion");
-//    svnMenu.add(actions.get("Subversion Status"));
-//    svnMenu.add(actions.get("Subversion Update"));
-//    svnMenu.add(actions.get("Subversion Commit"));
-//    bar.add(svnMenu);
-
-//    // bug("Making log menu!");
-//    JMenu logMenu = new JMenu("Log");
-//    logMenu.add(actions.get("Log Clear"));
-//    logMenu.add(actions.get("Log Post"));
-//    bar.add(logMenu);
-
     setJMenuBar(bar);
   }
 
@@ -346,157 +264,6 @@ public class OliveApplet extends JApplet {
     } else {
       bug("Bummer. " + fqClassName + " is bogus.");
     }
-  }
-
-//  protected void svnUpdate() throws IOException {
-//    HttpUtil wcl = interp.getMachine().getWebClassLoader();
-//    String up = getCodeBase() + "svn/update";
-//    bug("Sending sketch data to: " + up);
-//    String resp = wcl.downloadUrlToString(up);
-//    bug(resp);
-//  }
-//
-//  protected void svnCommit() throws IOException {
-//    String msg = JOptionPane.showInputDialog("Enter your (mandatory) commit message:");
-//    if (msg == null || msg.length() == 0) {
-//      bug("Cancelled commit.");
-//    } else {
-//      HttpUtil web = interp.getMachine().getWebClassLoader();
-//      String commit = getCodeBase() + "svn/commit";
-//      bug("Sending sketch data to: " + commit);
-//      HttpURLConnection con = web.initPostConnection(commit);
-//      String encodedCommitMsg = URLEncoder.encode(msg, "UTF-8");
-//      con.setRequestProperty("Content-Length", "" + encodedCommitMsg.length());
-//
-//      StreamUtil.writeStringToOutputStream(encodedCommitMsg, con.getOutputStream());
-//      con.getOutputStream().close();
-//      con.getInputStream();
-//    }
-//  }
-
-//  protected void svnStatus() throws IOException {
-//    HttpUtil web = interp.getMachine().getWebClassLoader();
-//    String st = getCodeBase() + "svn/status";
-//    bug("Sending svn st request to: " + st);
-//    String resp = web.downloadUrlToString(st);
-//    bug(resp);
-//    JOptionPane.showMessageDialog(null, resp);
-//  }
-
-  protected void browse() {
-    if (browserDialog == null) {
-      initBrowserDialog();
-    }
-    browserDialog.pack();
-    Components.centerComponent(browserDialog);
-    browserDialog.setVisible(true);
-  }
-
-  protected void initBrowserDialog() {
-    // TODO: I really want this to be implemented as a sort of popup menu.
-    Window anc = SwingUtilities.getWindowAncestor(this);
-    if (anc instanceof Dialog) {
-      browserDialog = new JDialog((Dialog) anc);
-    } else {
-      browserDialog = new JDialog((Frame) anc);
-    }
-    SketchThumbnailBrowser browser = new SketchThumbnailBrowser();
-    browser.setBaseURL(getCodeBase().toString() + "sketch/");
-    browser.setLimit(36);
-    browser.setNumCols(6);
-    browser.setThumbSize(64);
-    browser.fetch();
-    browser.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent ev) {
-        SlippyMachine.outputStream.println("Opening sketch "
-            + ((SketchThumbnail) ev.getSource()).getId());
-        try {
-          openSketch(((SketchThumbnail) ev.getSource()).getId());
-        } catch (IOException ex) {
-          ex.printStackTrace();
-        }
-      }
-    });
-    browserDialog.add(browser);
-  }
-
-  protected void saveSketch() throws IOException {
-    List<Thing> params = new ArrayList<Thing>();
-    params.add(new Thing.Str("Sequence"));
-    Thing result = SlippyUtils.dereference(soup.getSlippyObject().callWithParams("getActive",
-        params));
-    if (result.type == Thing.Type.Array) {
-      StringBuilder buf = new StringBuilder();
-      Thing.Array sequences = (Thing.Array) result;
-
-      for (Thing.Variable v : sequences.getData()) {
-        Thing.Instance val = (Thing.Instance) SlippyUtils.dereference(v);
-        Thing.Array points = (Thing.Array) SlippyUtils.dereference(val.getMember("points"));
-        boolean first = true;
-        for (Thing.Variable ptV : points.getData()) {
-          Thing.Instance pt = (Thing.Instance) SlippyUtils.dereference(ptV);
-          Thing x = pt.getMember("x");
-          int xInt = new Double(x.toString()).intValue();
-          Thing y = pt.getMember("y");
-          int yInt = new Double(y.toString()).intValue();
-          Thing t = pt.getMember("t");
-          long tLong = new Double(t.toString()).longValue();
-          buf.append((first ? "pen_down " : "pen_move ") + xInt + " " + yInt + " " + tLong + "\n");
-          first = false;
-        }
-        buf.append("pen_up\n");
-      }
-      HttpUtil web = interp.getMachine().getWebClassLoader();
-      String saveSketchURL = getCodeBase() + "sketch/save/";
-      bug("Sending sketch data to: " + saveSketchURL);
-      HttpURLConnection con = web.initPostConnection(saveSketchURL);
-      String encodedSketchString = URLEncoder.encode(buf.toString(), "UTF-8");
-      StreamUtil.writeStringToOutputStream(encodedSketchString, con.getOutputStream());
-      con.getOutputStream().close();
-      con.getInputStream(); // not sure why but this is necessary for the above to work.
-    }
-  }
-
-  protected void openSketch(final String id) throws IOException {
-    String sketchString = sketchStrings.get(id);
-    if (sketchString == null) {
-      Runnable runner = new Runnable() {
-        public void run() {
-          String openSketchURL = getCodeBase() + "sketch/" + id + ".sketch";
-          boolean fail = true;
-          try {
-            String responseString = interp.getMachine().getWebClassLoader().downloadUrlToString(
-                openSketchURL);
-            sketchStrings.put(id, responseString);
-            openSketchInSwingThread(responseString);
-            fail = false;
-          } catch (MalformedURLException ex) {
-            ex.printStackTrace();
-          } catch (IOException ex) {
-            ex.printStackTrace();
-          }
-          if (fail) {
-            bug("Could not download sketch " + id + ". Giving up.");
-          }
-        }
-      };
-      new Thread(runner).start();
-    } else {
-      openSketchInSwingThread(sketchString);
-    }
-  }
-
-  private void openSketchInSwingThread(final String sketchString) {
-    Runnable runner = new Runnable() {
-      public void run() {
-        soup.clearDrawing();
-        if (mouseThing != null) {
-          mouseThing.simulateUserInput(sketchString, surface);
-        }
-        surface.repaint();
-      }
-    };
-    SwingUtilities.invokeLater(runner);
   }
 
   /**
@@ -662,63 +429,11 @@ public class OliveApplet extends JApplet {
     } catch (Exception ex) {
       bug("Couldn't load org.six11.olive.OliveSoup. Continuing...");
     }
-    Thing.Function saveSketchFunction = new Thing.Function("saveSketch", SlippyUtils.mkList(),
-        "OliveApplet.java") {
-      public Thing eval(List<Thing> paramValues, SymbolTable context) {
-        try {
-          saveSketch();
-        } catch (IOException ex) {
-          ex.printStackTrace();
-        }
-        return Thing.NIL;
-      }
-    };
-    interp.getMachine().addGlobal("saveSketch", saveSketchFunction);
-    Thing.Function openSketchFunction = new Thing.Function("openSketch", SlippyUtils.mkList("id"),
-        "OliveApplet.java") {
-      public Thing eval(List<Thing> paramValues, SymbolTable context) {
-        try {
-          int id = new Double(paramValues.get(0).toString()).intValue();
-          openSketch(id + "");
-        } catch (IOException ex) {
-          ex.printStackTrace();
-        }
-        return Thing.NIL;
-      }
-    };
-    interp.getMachine().addGlobal("openSketch", openSketchFunction);
     mouseThing = new OliveMouseThing(soup);
     surface.addMouseMotionListener(mouseThing);
     surface.addMouseListener(mouseThing);
     new BoundDrawingBuffer(interp); // TODO: what is the point of this line?
   }
-
-//  protected void logClear() {
-//    stdout.setText("");
-//  }
-//
-//  protected void logPost() {
-//    String logContents = stdout.getText();
-//    int resp = 0;
-//    bug("posting log with " + logContents.length() + " chars...");
-//    try {
-//      HttpUtil web = interp.getMachine().getWebClassLoader();
-//      HttpURLConnection con = web.initPostConnection(getCodeBase() + "log/");
-//      StreamUtil.writeStringToOutputStream(URLEncoder.encode(logContents, "UTF-8"), con
-//          .getOutputStream());
-//      con.getOutputStream().close();
-//      con.getInputStream(); // not sure why but this is necessary for the above to work.
-//      resp = con.getResponseCode();
-//      Debug.outputStream.println("Got response code from server: " + resp);
-//      Debug.outputStream.println("Posted log file (" + logContents.length()
-//          + " characters). Check the 'logs' listing.");
-//    } catch (MalformedURLException ex) {
-//      ex.printStackTrace();
-//    } catch (IOException ex) {
-//      ex.printStackTrace();
-//    }
-//    bug("OK, done with logPost() (response code: " + resp + ")");
-//  }
 
   protected void interpret() {
     Debug.outputStream.println("------- (interpreting at " + new Date() + ") ---");
