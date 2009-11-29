@@ -25,4 +25,5 @@ fi
 
 cpmunge build/classes
 prog=org.six11.olive.Main
-java -classpath $CP $prog $@
+flags=--load-path=slippy-code
+java -classpath $CP $prog $flags $@
