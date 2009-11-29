@@ -234,11 +234,11 @@ public class SlippyInterpreter {
     Thing ret = Thing.NIL;
 
     if (!machine.getCodeset(codesetStr).hasClass(className)) {
-      String fullFileName = machine.getFullFileName(className, codesetStr);
+      String fullFileName = machine.getEnvironment().getFullFileName(className, codesetStr);
       if (!machine.isFileLoaded(fullFileName)) {
         try {
           machine.pushFileName(fullFileName);
-          String program = machine.loadStringFromFile(fullFileName);
+          String program = machine.getEnvironment().loadStringFromFile(fullFileName); // machine.loadStringFromFile(fullFileName);
           handleInput(program);
         } catch (Exception ex) {
            String callingFile = machine.getCallingFile();
@@ -308,16 +308,10 @@ public class SlippyInterpreter {
     c.symbols.setName("Symbol table for class " + c.name);
     c.symbols.clazz = c;
     machine.popSymbolTable();
-    if (!machine.isWebEnvironment()) { // in disk-mode ensure the directory structure is OK
-      if (!SlippyUtils.isCorrectCodeset(c, machine.getCurrentFile(), machine.getLoadPath())) {
-        err(bugLocation(t) + ": Defined class '" + c.name + "' in codeset '" + c.codeset.codesetStr
-            + "', but it was located in file '" + machine.getCurrentFile()
-            + "'. It was expected to be in '" + machine.getLoadPath() + File.separator
-            + c.codeset.getPathString() + c.name + ".slippy'"
-            + ". Ensure your classes are in the proper location in the source tree. You might "
-            + "have forgotten to put the right codeset statement at the top of your file.");
-      }
-    }
+    // TODO: might want to help the user out here by ensuring that the class is in the right file:
+    // if (!SlippyUtils.isCorrectCodeset(c, machine.getCurrentFile(), machine.getLoadPath())) {
+    //  complain();
+    // }
   }
 
   private Thing.Function stashFunction(Tree t) {

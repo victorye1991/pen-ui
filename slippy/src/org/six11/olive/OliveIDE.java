@@ -5,10 +5,8 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -23,9 +21,6 @@ import org.antlr.runtime.tree.Tree;
 import org.six11.slippy.*;
 import org.six11.util.Debug;
 import org.six11.util.gui.ColoredTextPane;
-import org.six11.util.io.FileUtil;
-import org.six11.util.io.HttpUtil;
-import org.six11.util.io.StreamUtil;
 import org.six11.util.lev.NamedAction;
 
 import static java.awt.event.InputEvent.*;
@@ -35,7 +30,7 @@ import static java.awt.event.InputEvent.*;
  * 
  * @author Gabe Johnson <johnsogg@cmu.edu>
  */
-public class OliveApplet extends JApplet {
+public class OliveIDE extends JComponent {
 
   private static final String SCRATCH_NAME = "*scratch*";
   protected Object fileName;
@@ -52,19 +47,21 @@ public class OliveApplet extends JApplet {
   private OliveSoup soup;
   private OliveMouseThing mouseThing;
   private OliveDrawingSurface surface;
+  private Environment env;
 
-  private boolean isRunningInBrowser;
-  private String loadPath = ".";
-
-  public OliveApplet() {
+  public OliveIDE() {
     super();
-    isRunningInBrowser = true;
+    env = new DiskEnvironment();
   }
 
-  public OliveApplet(boolean inBrowser, String slippySourcePath) {
+  public OliveIDE(boolean inBrowser, String slippySourcePath) {
     super();
-    isRunningInBrowser = inBrowser;
-    loadPath = slippySourcePath;
+    if (inBrowser) {
+      env = new WebEnvironment();
+    } else {
+      env = new DiskEnvironment();
+    }
+    env.setLoadPath(slippySourcePath);
   }
 
   /**
@@ -137,13 +134,13 @@ public class OliveApplet extends JApplet {
 
     initSlippy();
 
-    if (isRunningInBrowser) {
-      resetJavaBindings();
-      includeSampleProgram1();
-      interpret();
-    }
+//    if (isRunningInBrowser) {
+//      resetJavaBindings();
+//      includeSampleProgram1();
+//      interpret();
+//    }
 
-    Debug.out("OliveApplet", "Initialized!");
+    Debug.out("OliveIDE", "Initialized!");
 
   }
 
@@ -165,19 +162,20 @@ public class OliveApplet extends JApplet {
   private final void initSlippy() {
     SlippyMachine.outputStream = Debug.outputStream;
     interp = new SlippyInterpreter();
-    interp.getMachine().setWebEnvironment(isRunningInBrowser);
-    if (isRunningInBrowser) {
-      interp.getMachine().setLoadPath(getCodeBase().toString() + "code/");
-    } else {
-      bug("Setting source load path to: " + loadPath);
-      interp.getMachine().setLoadPath(loadPath);
-    }
+    interp.getMachine().setEnvironment(env);
+//    interp.getMachine().setWebEnvironment(isRunningInBrowser);
+//    if (isRunningInBrowser) {
+//      interp.getMachine().setLoadPath(getCodeBase().toString() + "code/");
+//    } else {
+//      bug("Setting source load path to: " + loadPath);
+//      interp.getMachine().setLoadPath(loadPath);
+//    }
 
     interp.getMachine().pushFileName("(new or unsaved file)");
 
     // Slippy code can use the 'signal' function to pass events and arbitrary Thing objects
     // back into Java. This is done using a message bus.
-    interp.getMachine().setMessageBus(new OliveAppletMessageBus(this));
+    interp.getMachine().setMessageBus(new OliveIDEMessageBus(this));
 
   }
 
@@ -247,11 +245,11 @@ public class OliveApplet extends JApplet {
     fileMenu.add(actions.get("Save Sketch"));
     fileMenu.add(actions.get("Browse"));
     bar.add(fileMenu);
-    setJMenuBar(bar);
+//    setJMenuBar(bar); // This got whacked when I moved to OliveIDE
   }
 
   private static void bug(String what) {
-    Debug.out("OliveApplet", what);
+    Debug.out("OliveIDE", what);
   }
 
   protected void newFile() {
@@ -334,16 +332,17 @@ public class OliveApplet extends JApplet {
   protected void loadBuffer(String fqClassName) throws MalformedURLException, IOException {
     bug("loadBuffer gets: " + fqClassName);
     if (!buffers.containsKey(fqClassName)) {
-      String programSource = "";
-      String where = interp.getMachine().getLoadPath();
-      if (where.startsWith("http")) {
-        String url = where + "request/" + fqClassName;
-        programSource = interp.getMachine().getWebClassLoader().downloadUrlToString(url);
-      } else {
-        String fileName = where + File.separator + SlippyUtils.codesetStrToFileStr(fqClassName);
-        bug("Attempting to load from file: " + fileName);
-        programSource = FileUtil.loadStringFromFile(fileName);
-      }
+      String programSource = env.loadStringFromFile(env.classNameToFileName(fqClassName));
+      
+//      String where = interp.getMachine().getLoadPath();
+//      if (where.startsWith("http")) {
+//        String url = where + "request/" + fqClassName;
+//        programSource = interp.getMachine().getWebClassLoader().downloadUrlToString(url);
+//      } else {
+//        String fileName = where + File.separator + SlippyUtils.codesetStrToFileStr(fqClassName);
+//        bug("Attempting to load from file: " + fileName);
+//        programSource = FileUtil.loadStringFromFile(fileName);
+//      }
       buffers.put(fqClassName, programSource);
     }
   }
@@ -380,21 +379,20 @@ public class OliveApplet extends JApplet {
   }
 
   protected void save() throws IOException {
+    // 1. if this is the scratch buffer, use saveAs()
     SlippyEditor active = (SlippyEditor) editorTabs.getSelectedComponent();
     if (active.getFQClassName().equals(SCRATCH_NAME)) {
       saveAs();
     }
+
+    // 2. Ask the environment to save the program string.
     String programString = URLEncoder.encode(active.getTextPane().getText(), "UTF-8");
     buffers.put(active.getFQClassName(), programString);
-    HttpUtil web = interp.getMachine().getWebClassLoader();
-    HttpURLConnection con = web.initPostConnection(interp.getMachine().getLoadPath() + "save/"
-        + active.getFQClassName());
-    StreamUtil.writeStringToOutputStream(programString, con.getOutputStream());
-    con.getOutputStream().close();
-    con.getInputStream(); // not sure why but this is necessary for the above to work.
+    env.save(active.getFQClassName(), programString);
+    
+    // 3. Colorize and un-dirty the buffer.
     active.colorize();
     active.setDirty(false);
-    bug("Saved: " + active.getFQClassName());
   }
 
   protected void saveAs() throws IOException {
@@ -443,7 +441,7 @@ public class OliveApplet extends JApplet {
     String fqClassName = editor.getFQClassName();
     String codesetStr = SlippyUtils.getCodesetName(fqClassName);
     String className = SlippyUtils.getClassName(fqClassName);
-    interp.getMachine().pushFileName(interp.getMachine().getFullFileName(className, codesetStr));
+    interp.getMachine().pushFileName(env.getFullFileName(className, codesetStr));
     String programString = editor.getTextPane().getText();
     try {
       interp.handleInput(programString);
@@ -484,7 +482,8 @@ public class OliveApplet extends JApplet {
   protected JMenu getSlippyMenu() {
     if (slippyMenu == null) {
       slippyMenu = new JMenu("Slippy Functions");
-      getJMenuBar().add(slippyMenu);
+      // TODO: when moving to non-Applet, the getJMenuBar() went MIA. Fix this.
+//      getJMenuBar().add(slippyMenu);
     }
     return slippyMenu;
   }
@@ -550,10 +549,6 @@ public class OliveApplet extends JApplet {
     return ret;
   }
 
-  public void start() {
-    super.start();
-  }
-
   public OliveSoup getSoup() {
     return soup;
   }
@@ -589,32 +584,4 @@ public class OliveApplet extends JApplet {
       }
     }
   }
-
-  private void includeSampleProgram1() {
-    StringBuilder buf = new StringBuilder();
-    buf.append("; Welcome to Olive!\n\n");
-    buf.append("; The following is a sample Slippy program. Feel free to edit\n");
-    buf.append("; it and play around. You can hit Control-Enter to run your program\n");
-    buf.append("; if you get tired of clicking the Run button. For a complete\n");
-    buf.append("; reference on Slippy's syntax, you'll have to read my mind, since\n");
-    buf.append("; I haven't written one yet. Soon, grasshopper. Soon.\n\n");
-    buf.append("define fib(n, m, max, runningList)\n");
-    buf.append("  next = n + m\n");
-    buf.append("  if (next < max)\n");
-    buf.append("    runningList.add(next)\n");
-    buf.append("    fib(m, next, max, runningList)\n");
-    buf.append("  done\n");
-    buf.append("done\n");
-    buf.append("\n");
-    buf.append("runningList = [1, 1]\n");
-    buf.append("fib(1, 1, 2000, runningList)\n");
-    buf.append("\n");
-    buf.append("print(\"Found \" + runningList.n() + \" Fibonacci numbers:\")\n");
-    buf.append("runningList.each( {(n) print (n) } )\n");
-
-    activeEditor.getTextPane().setText(buf.toString());
-    activeEditor.getTextPane().setCaretPosition(0);
-    activeEditor.scrollRectToVisible(new Rectangle());
-  }
-
 }

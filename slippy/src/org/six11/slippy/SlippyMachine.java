@@ -1,17 +1,11 @@
 package org.six11.slippy;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.net.MalformedURLException;
 import java.util.*;
 
 import org.six11.slippy.Thing.Annotation;
 import org.six11.slippy.Thing.Function;
 import org.six11.util.Debug;
-import org.six11.util.io.FileUtil;
-import org.six11.util.io.HttpUtil;
 
 /**
  * 
@@ -35,8 +29,7 @@ public class SlippyMachine {
   private Thing retVal;
   private SymbolTable globalTable;
   private String loadPath;
-  private boolean webEnvironment = false;
-  private HttpUtil web;
+  private Environment env;
   private Map<String, Thing.Codeset> fileToCodeset; // maps filenames to codesets
   MessageBus messageBus;
 
@@ -49,12 +42,12 @@ public class SlippyMachine {
     return globalTable;
   }
 
-  public boolean isWebEnvironment() {
-    return webEnvironment;
+  public Environment getEnvironment() {
+    return env;
   }
-
-  public void setWebEnvironment(boolean v) {
-    this.webEnvironment = v;
+  
+  public void setEnvironment(Environment env) {
+    this.env = env;
   }
 
   public SlippyMachine(final SlippyInterpreter interp) {
@@ -350,12 +343,12 @@ public class SlippyMachine {
     return fileLoaded;
   }
 
-  public HttpUtil getWebClassLoader() throws MalformedURLException {
-    if (web == null) {
-      web = new HttpUtil();
-    }
-    return web;
-  }
+//  public HttpUtil getWebClassLoader() throws MalformedURLException {
+//    if (web == null) {
+//      web = new HttpUtil();
+//    }
+//    return web;
+//  }
 
   public boolean isFileLoaded(String fileName) {
     return loadedFiles.contains(fileName);
@@ -409,33 +402,6 @@ public class SlippyMachine {
 
   public static void setOutputStream(PrintStream outputStream) {
     SlippyMachine.outputStream = outputStream;
-  }
-
-  public String loadStringFromFile(String fullFileName) throws FileNotFoundException, IOException {
-    String ret = "";
-    if (isWebEnvironment()) {
-      try {
-        HttpUtil wcl = getWebClassLoader();
-        ret = wcl.downloadUrlToString(fullFileName);
-      } catch (IOException ex) {
-        ex.printStackTrace();
-      }
-    } else {
-      ret = FileUtil.loadStringFromFile(fullFileName);
-    }
-    return ret;
-  }
-
-  public String getFullFileName(String className, String codesetStr) {
-    String ret = "";
-    if (isWebEnvironment()) {
-      ret = getLoadPath() + "request/" + (codesetStr.length() > 0 ? codesetStr + "." : "")
-          + className;
-    } else {
-      ret = getLoadPath() + File.separatorChar + codesetStr.replace('.', File.separatorChar)
-          + File.separator + className + ".slippy";
-    }
-    return ret;
   }
 
   public void pushFunctionName(String name) {

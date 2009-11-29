@@ -39,9 +39,9 @@ public class Main {
 
     String loadPath = args.hasValue("load-path") ? args.getValue("load-path") : ".";
 
-    OliveApplet applet = new OliveApplet(false, loadPath);
-    applet.init();
-    af.add(applet);
+    OliveIDE ide = new OliveIDE(false, loadPath);
+    ide.init();
+    af.add(ide);
     af.setVisible(true);
   }
 }
