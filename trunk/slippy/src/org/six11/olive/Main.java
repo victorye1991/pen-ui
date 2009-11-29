@@ -2,17 +2,20 @@
 
 package org.six11.olive;
 
+import java.awt.BorderLayout;
+
 import org.six11.util.args.Arguments;
 import org.six11.util.args.Arguments.ArgType;
 import org.six11.util.args.Arguments.ValueType;
 import org.six11.util.gui.ApplicationFrame;
 
 public class Main {
-  
+
   public static final String VERSION = "$Id$";
-  
+
   public static void main(String[] in) {
     ApplicationFrame af = new ApplicationFrame("Olive");
+    af.setLayout(new BorderLayout());
     af.setSize(800, 600);
     af.center();
 
@@ -38,10 +41,10 @@ public class Main {
     }
 
     String loadPath = args.hasValue("load-path") ? args.getValue("load-path") : ".";
-
     OliveIDE ide = new OliveIDE(false, loadPath);
-    ide.init();
-    af.add(ide);
+    ide.attachKeyListener(af.getRootPane());
+    ide.setBackground(java.awt.Color.RED);
+    af.add(ide, BorderLayout.CENTER);
     af.setVisible(true);
   }
 }

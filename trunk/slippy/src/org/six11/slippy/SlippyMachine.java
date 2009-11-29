@@ -28,7 +28,7 @@ public class SlippyMachine {
 
   private Thing retVal;
   private SymbolTable globalTable;
-  private String loadPath;
+//  private String loadPath;
   private Environment env;
   private Map<String, Thing.Codeset> fileToCodeset; // maps filenames to codesets
   MessageBus messageBus;
@@ -313,15 +313,6 @@ public class SlippyMachine {
 
   public void setReturnValue(Thing ret) {
     retVal = ret;
-  }
-
-  public void setLoadPath(String path) {
-    loadPath = path;
-    bug("Set load path to " + path);
-  }
-
-  public String getLoadPath() {
-    return loadPath;
   }
 
   public void pushFileName(String n) {

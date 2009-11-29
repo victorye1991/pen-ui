@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
+import org.six11.olive.DiskEnvironment;
 import org.six11.olive.DrawingBuffer;
 import org.six11.olive.OliveMouseThing;
 import org.six11.olive.OliveSoup;
@@ -39,7 +40,9 @@ public class PenIOExample {
     String loadPath = args[0];
     SlippyInterpreter interp = new SlippyInterpreter();
     SlippyMachine machine = interp.getMachine();
-    machine.setLoadPath(loadPath);
+    Environment env = new DiskEnvironment();
+    env.setLoadPath(loadPath);
+    machine.setEnvironment(env);
 
     new org.six11.olive.BoundDrawingBuffer(interp);
     new PenIOExample(interp).go();
