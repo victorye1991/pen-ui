@@ -29,13 +29,13 @@ public class OliveDrawingSurface extends JComponent {
   private Color penDisabledBorderColor;
   private double borderPad;
   private boolean penEnabled = false;
-  private OliveApplet applet;
+  private OliveIDE ide;
 
   /**
    * Make an Olive drawing surface, but do not show it.
    */
-  public OliveDrawingSurface(OliveApplet applet) {
-    this.applet = applet;
+  public OliveDrawingSurface(OliveIDE ide) {
+    this.ide = ide;
 
     // establish border and background variables
     bgColor = Colors.getDefault().get(Colors.BACKGROUND);
@@ -52,7 +52,7 @@ public class OliveDrawingSurface extends JComponent {
     Graphics2D g = (Graphics2D) g1;
     drawBorderAndBackground(g);
     AffineTransform before = new AffineTransform(g.getTransform());
-    OliveSoup soup = applet.getSoup();
+    OliveSoup soup = ide.getSoup();
     if (soup != null) {
       Shape currentSeq = soup.getCurrentSequence(); // the in-progress scribble
       List<DrawingBuffer> buffers = soup.getDrawingBuffers(); // finished visual elements
