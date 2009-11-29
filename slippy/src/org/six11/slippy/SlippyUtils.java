@@ -221,7 +221,7 @@ public abstract class SlippyUtils {
    */
   public static String getFullFileName(SlippyInterpreter interp, String fullCodesetAndClassName) {
     StringBuilder buf = new StringBuilder();
-    buf.append(interp.getMachine().getLoadPath());
+    buf.append(interp.getMachine().getEnvironment().getLoadPath());
     if (!buf.toString().endsWith(File.separator)) {
       buf.append("/");
     }

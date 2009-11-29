@@ -9,7 +9,9 @@ import java.util.Collection;
 
 import javax.swing.JComponent;
 
+import org.six11.olive.DiskEnvironment;
 import org.six11.olive.DrawingBuffer;
+import org.six11.slippy.Environment;
 import org.six11.slippy.SlippyInterpreter;
 import org.six11.slippy.SlippyMachine;
 import org.six11.slippy.SlippyUtils;
@@ -34,8 +36,9 @@ public class GraphicsExample {
     String className = args[1];
     SlippyInterpreter interp = new SlippyInterpreter();
     SlippyMachine machine = interp.getMachine();
-    machine.setLoadPath(loadPath);
-
+    Environment env = new DiskEnvironment();
+    env.setLoadPath(loadPath);
+    machine.setEnvironment(env);// machine.setLoadPath(loadPath);
     new BoundDrawingBuffer(interp);
     new GraphicsExample(interp, className).go();
   }
@@ -46,7 +49,7 @@ public class GraphicsExample {
       IOException {
     af = new ApplicationFrame("Slippy Graphics Example");
     bug("Loading slippy file...");
-    interp.runFile(interp.getMachine().getLoadPath() + File.separator
+    interp.runFile(interp.getMachine().getEnvironment().getLoadPath() + File.separator
         + SlippyUtils.codesetStrToFileStr(className));
     bug("Loaded slippy file.");
 

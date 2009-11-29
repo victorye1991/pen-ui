@@ -15,7 +15,11 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree; // import org.six11.slippy.Thing.Function;
+import org.six11.olive.DiskEnvironment;
 import org.six11.util.Debug;
+import org.six11.util.args.Arguments;
+import org.six11.util.args.Arguments.ArgType;
+import org.six11.util.args.Arguments.ValueType;
 import org.six11.util.io.FileUtil; // import static org.six11.slippy.SlippyLexer.*;
 import static org.six11.slippy.SlippyParser.*;
 
@@ -30,18 +34,18 @@ public class SlippyInterpreter {
    * @param args
    */
   public static void main(String[] args) throws Exception {
-    if (args.length == 0) {
-      System.out.println("Syntax: ./run fileName [ --tree ] [ --quit ] [ --cp=CLASSPATH ]");
-      System.out.println("  The --tree arg causes it to spit out the AST.");
-      System.out.println("  The --quit arg prints the AST (if --tree is specified), "
-          + "but doesn't run the program.");
-      System.out.println("  The --cp=CLASSPATH arg causes the interpreter to look for "
-          + "slippy classes with the given root.");
-      System.exit(0);
-    } else {
-      SlippyInterpreter interp = new SlippyInterpreter();
-      interp.useArguments(args);
-    }
+    Arguments arguments = new Arguments();
+    arguments.addFlag("tree", ArgType.ARG_OPTIONAL, ValueType.VALUE_IGNORED,
+        "Shows the abstract syntax tree");
+    arguments.addFlag("quit", ArgType.ARG_OPTIONAL, ValueType.VALUE_IGNORED,
+        "Quit the interpreter after showing the AST");
+    arguments.addFlag("load-path", ArgType.ARG_OPTIONAL, ValueType.VALUE_REQUIRED,
+        "The load path to slippy code (defaults to path of main Slippy file)");
+    arguments.addPositional(0, "file", ValueType.VALUE_REQUIRED, "The main Slippy source file");
+    arguments.parseArguments(args);
+    arguments.validate();
+    SlippyInterpreter interp = new SlippyInterpreter();
+    interp.useArguments(arguments);
   }
 
   private SlippyMachine machine;
@@ -53,38 +57,21 @@ public class SlippyInterpreter {
     machine = new SlippyMachine(this);
   }
 
-  public void useArguments(String[] args) throws Exception {
-    boolean stayAlive = true;
-    boolean tree = false;
-    String file = null;
-    String cp = null;
-    for (String s : args) {
-      if (s.equals("--tree")) {
-        tree = true;
-      } else if (s.equals("--quit")) {
-        stayAlive = false;
-      } else if (s.startsWith("--cp=")) {
-        bug("--cp=.length() is " + "--cp=".length());
-        cp = s.substring("--cp=".length());
-        bug("Now using cp as "+ cp);
-      } else {
-        file = s;
-      }
-    }
-    if (cp == null) {
-      machine.setLoadPath(FileUtil.getPath(file));
-    } else {
-      machine.setLoadPath(cp);
-    }
+  public void useArguments(Arguments args) throws Exception {
+    String file = args.getValue("file");
+    String cp = args.hasFlag("load-path") ? args.getValue("load-path") : FileUtil.getPath(file);
+    Environment env = new DiskEnvironment();
+    env.setLoadPath(cp);
+    machine.setEnvironment(env);
     String program = FileUtil.loadStringFromFile(file);
-    if (tree) {
+    if (args.hasFlag("tree")) {
       // show me the parse tree instead of interpreting
       Tree root = makeTree(program);
       SlippyDebugger.processTree(root, 1);
     }
     new Affine(this);
     machine.pushFileName(file);
-    if (stayAlive) {
+    if (!args.hasFlag("quit")) {
       handleInput(program);
     }
   }
@@ -241,7 +228,7 @@ public class SlippyInterpreter {
           String program = machine.getEnvironment().loadStringFromFile(fullFileName); // machine.loadStringFromFile(fullFileName);
           handleInput(program);
         } catch (Exception ex) {
-           String callingFile = machine.getCallingFile();
+          String callingFile = machine.getCallingFile();
           err("Can't load source file '" + fullFileName + "'"
               + (callingFile == null ? "" : ", referenced from " + callingFile));
         } finally {
@@ -310,7 +297,7 @@ public class SlippyInterpreter {
     machine.popSymbolTable();
     // TODO: might want to help the user out here by ensuring that the class is in the right file:
     // if (!SlippyUtils.isCorrectCodeset(c, machine.getCurrentFile(), machine.getLoadPath())) {
-    //  complain();
+    // complain();
     // }
   }
 

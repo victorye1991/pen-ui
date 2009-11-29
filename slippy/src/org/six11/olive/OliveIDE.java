@@ -30,7 +30,7 @@ import static java.awt.event.InputEvent.*;
  * 
  * @author Gabe Johnson <johnsogg@cmu.edu>
  */
-public class OliveIDE extends JComponent {
+public class OliveIDE extends JPanel {
 
   private static final String SCRATCH_NAME = "*scratch*";
   protected Object fileName;
@@ -62,6 +62,7 @@ public class OliveIDE extends JComponent {
       env = new DiskEnvironment();
     }
     env.setLoadPath(slippySourcePath);
+    init();
   }
 
   /**
@@ -81,9 +82,8 @@ public class OliveIDE extends JComponent {
 
   private WhackTabWhenDirty dirtyWhacker;
 
-  public void init() {
-
-    Debug.useColor = false;
+  private void init() {
+    setLayout(new BorderLayout());
     initActions();
     slippyButtons = new HashMap<String, JButton>();
     slippyMenuItems = new HashMap<String, JMenuItem>();
@@ -104,6 +104,8 @@ public class OliveIDE extends JComponent {
     stdout.setFocusable(true);
     stdout.setAutoscroll(true);
 
+    Debug.useColor = false;
+    Debug.useTime = false;
     Debug.outputStream = new PrintStream(new RedirectedOutputStream(stdout), true);
     initMenu();
     buttons = new JPanel();
@@ -129,19 +131,9 @@ public class OliveIDE extends JComponent {
         "The happy funtime ballroom of editing buffers");
     JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, left, editorTabs);
     split.setDividerLocation(400);
-
-    add(split);
-
+    add(split, BorderLayout.CENTER);
     initSlippy();
-
-//    if (isRunningInBrowser) {
-//      resetJavaBindings();
-//      includeSampleProgram1();
-//      interpret();
-//    }
-
     Debug.out("OliveIDE", "Initialized!");
-
   }
 
   private class WhackTabWhenDirty implements PropertyChangeListener {
@@ -159,24 +151,29 @@ public class OliveIDE extends JComponent {
     }
   }
 
+  public Dimension getPreferredSize() {
+    bug("Returning my preferred size: " + Debug.num(super.getPreferredSize()));
+    return super.getPreferredSize();
+  }
+  
+  public Dimension getMinimumSize() {
+    bug("Returning my preferred size: " + Debug.num(super.getMinimumSize()));
+    return super.getMinimumSize();
+  }
+  public Dimension getMaximumSize() {
+    bug("Returning my preferred size: " + Debug.num(super.getMaximumSize()));
+    return super.getMaximumSize();
+  }
+  
   private final void initSlippy() {
     SlippyMachine.outputStream = Debug.outputStream;
     interp = new SlippyInterpreter();
     interp.getMachine().setEnvironment(env);
-//    interp.getMachine().setWebEnvironment(isRunningInBrowser);
-//    if (isRunningInBrowser) {
-//      interp.getMachine().setLoadPath(getCodeBase().toString() + "code/");
-//    } else {
-//      bug("Setting source load path to: " + loadPath);
-//      interp.getMachine().setLoadPath(loadPath);
-//    }
-
     interp.getMachine().pushFileName("(new or unsaved file)");
 
     // Slippy code can use the 'signal' function to pass events and arbitrary Thing objects
     // back into Java. This is done using a message bus.
     interp.getMachine().setMessageBus(new OliveIDEMessageBus(this));
-
   }
 
   private final void initActions() {
@@ -219,16 +216,17 @@ public class OliveIDE extends JComponent {
         newFile();
       }
     };
-
     actions.put("New", newAction);
+  }
+
+  public final void attachKeyListener(JRootPane rp) {
     for (Action action : actions.values()) {
       KeyStroke s = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
       if (s != null) {
-        getRootPane().registerKeyboardAction(action, s, JComponent.WHEN_IN_FOCUSED_WINDOW);
+        rp.registerKeyboardAction(action, s, JComponent.WHEN_IN_FOCUSED_WINDOW);
       }
     }
   }
-
   private final void initButtons(JPanel buttons) {
     buttons.setLayout(new GridLayout(0, 3));
 
@@ -245,7 +243,7 @@ public class OliveIDE extends JComponent {
     fileMenu.add(actions.get("Save Sketch"));
     fileMenu.add(actions.get("Browse"));
     bar.add(fileMenu);
-//    setJMenuBar(bar); // This got whacked when I moved to OliveIDE
+    // setJMenuBar(bar); // This got whacked when I moved to OliveIDE
   }
 
   private static void bug(String what) {
@@ -333,16 +331,16 @@ public class OliveIDE extends JComponent {
     bug("loadBuffer gets: " + fqClassName);
     if (!buffers.containsKey(fqClassName)) {
       String programSource = env.loadStringFromFile(env.classNameToFileName(fqClassName));
-      
-//      String where = interp.getMachine().getLoadPath();
-//      if (where.startsWith("http")) {
-//        String url = where + "request/" + fqClassName;
-//        programSource = interp.getMachine().getWebClassLoader().downloadUrlToString(url);
-//      } else {
-//        String fileName = where + File.separator + SlippyUtils.codesetStrToFileStr(fqClassName);
-//        bug("Attempting to load from file: " + fileName);
-//        programSource = FileUtil.loadStringFromFile(fileName);
-//      }
+
+      // String where = interp.getMachine().getLoadPath();
+      // if (where.startsWith("http")) {
+      // String url = where + "request/" + fqClassName;
+      // programSource = interp.getMachine().getWebClassLoader().downloadUrlToString(url);
+      // } else {
+      // String fileName = where + File.separator + SlippyUtils.codesetStrToFileStr(fqClassName);
+      // bug("Attempting to load from file: " + fileName);
+      // programSource = FileUtil.loadStringFromFile(fileName);
+      // }
       buffers.put(fqClassName, programSource);
     }
   }
@@ -358,7 +356,8 @@ public class OliveIDE extends JComponent {
   }
 
   protected void open() {
-    String where = interp.getMachine().getLoadPath();
+    bug("The OliveIDE.open() function should use an environment method. Fix this.");
+    String where = interp.getMachine().getEnvironment().getLoadPath();
     bug("Looking for files here: " + where);
     String fqClassName = ClassChooser.showClassChooser(this, where);
     bug("Class chooser replies with: " + fqClassName);
@@ -389,7 +388,7 @@ public class OliveIDE extends JComponent {
     String programString = URLEncoder.encode(active.getTextPane().getText(), "UTF-8");
     buffers.put(active.getFQClassName(), programString);
     env.save(active.getFQClassName(), programString);
-    
+
     // 3. Colorize and un-dirty the buffer.
     active.colorize();
     active.setDirty(false);
@@ -483,7 +482,7 @@ public class OliveIDE extends JComponent {
     if (slippyMenu == null) {
       slippyMenu = new JMenu("Slippy Functions");
       // TODO: when moving to non-Applet, the getJMenuBar() went MIA. Fix this.
-//      getJMenuBar().add(slippyMenu);
+      // getJMenuBar().add(slippyMenu);
     }
     return slippyMenu;
   }

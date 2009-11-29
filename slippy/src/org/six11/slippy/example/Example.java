@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.six11.olive.DiskEnvironment;
+import org.six11.slippy.Environment;
 import org.six11.slippy.SlippyInterpreter;
 import org.six11.slippy.SlippyMachine;
 import org.six11.slippy.SlippyObject;
@@ -30,7 +32,9 @@ public class Example {
     String className = args[1];
     SlippyInterpreter interp = new SlippyInterpreter();
     SlippyMachine machine = interp.getMachine();
-    machine.setLoadPath(loadPath);
+    Environment env = new DiskEnvironment();
+    env.setLoadPath(loadPath);
+    machine.setEnvironment(env);// machine.setLoadPath(loadPath);
 
     int stop = Math.max(0, className.lastIndexOf('.') + 1);
     String baseName = className.substring(stop);
@@ -70,7 +74,7 @@ public class Example {
       bug("\t" + s);
     }
     bug("Running the 'UseBinding.slippy' file...");
-    interp.runFile(interp.getMachine().getLoadPath() + File.separator
+    interp.runFile(interp.getMachine().getEnvironment().getLoadPath() + File.separator
         + "org/six11/slippy/example/UseBinding.slippy");
     bug("'UseBinding.slippy' complete.");
   }
